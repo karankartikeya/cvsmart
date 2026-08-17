@@ -1,69 +1,218 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { generateCoverLetter } from "@/lib/api";
+import type { CoverLetterResponse } from "@/lib/types";
 
 export default function Home() {
+  const [jobUrl, setJobUrl] = useState("");
+  const [companyUrl, setCompanyUrl] = useState("");
+  const [candidateName, setCandidateName] = useState("");
+  const [candidateBackground, setCandidateBackground] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<CoverLetterResponse | null>(null);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setResult(null);
+    try {
+      const res = await generateCoverLetter({
+        job_url: jobUrl,
+        company_url: companyUrl,
+        candidate_name: candidateName,
+        candidate_background: candidateBackground,
+      });
+      setResult(res);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <div className="min-h-screen bg-zinc-50 dark:bg-black">
+      <main className="mx-auto max-w-3xl px-6 py-16">
+        <div className="mb-10 flex items-center justify-between">
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
+            Job Application Intelligence
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/health"
+            className="text-sm font-medium text-zinc-500 hover:text-zinc-950 dark:text-zinc-400 dark:hover:text-zinc-50"
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+            Collector health →
+          </Link>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <Field label="Job posting URL">
+            <input
+              required
+              type="url"
+              value={jobUrl}
+              onChange={(e) => setJobUrl(e.target.value)}
+              placeholder="https://boards.greenhouse.io/company/jobs/12345"
+              className="input"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          </Field>
+          <Field label="Company site URL (about / blog / careers)">
+            <input
+              required
+              type="url"
+              value={companyUrl}
+              onChange={(e) => setCompanyUrl(e.target.value)}
+              placeholder="https://company.com/about"
+              className="input"
+            />
+          </Field>
+          <Field label="Your name">
+            <input
+              required
+              value={candidateName}
+              onChange={(e) => setCandidateName(e.target.value)}
+              className="input"
+            />
+          </Field>
+          <Field label="Your background (2-3 sentences)">
+            <textarea
+              required
+              value={candidateBackground}
+              onChange={(e) => setCandidateBackground(e.target.value)}
+              rows={4}
+              className="input"
+            />
+          </Field>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-lg bg-zinc-950 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-950 dark:hover:bg-zinc-200"
           >
-            Documentation
-          </a>
-        </div>
+            {loading ? "Scraping and drafting..." : "Generate cover letter"}
+          </button>
+        </form>
+
+        {error && (
+          <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-300">
+            {error}
+          </div>
+        )}
+
+        {result && <Result result={result} />}
       </main>
     </div>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <span className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+        {label}
+      </span>
+      {children}
+    </label>
+  );
+}
+
+function Result({ result }: { result: CoverLetterResponse }) {
+  return (
+    <div className="mt-10 space-y-8">
+      <section>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+          Cover letter
+        </h2>
+        <div className="whitespace-pre-wrap rounded-lg border border-zinc-200 bg-white p-6 text-sm leading-relaxed text-zinc-800 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-200">
+          {result.cover_letter}
+        </div>
+      </section>
+
+      <section className="grid gap-6 sm:grid-cols-2">
+        <div>
+          <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            Job posting extracted
+          </h3>
+          <dl className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+            <Row k="Role" v={result.job_posting.role_title} />
+            <Row k="Company" v={result.job_posting.company_name} />
+            <Row k="Seniority" v={result.job_posting.seniority_level} />
+            <Row k="Location" v={result.job_posting.location} />
+            <Row k="Salary" v={result.job_posting.salary} />
+          </dl>
+        </div>
+        <div>
+          <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            Company context extracted
+          </h3>
+          <dl className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
+            <Row k="Mission" v={result.company_context.mission} />
+            <Row
+              k="Announcements"
+              v={result.company_context.recent_announcements.join(", ") || null}
+            />
+            <Row k="Tech stack" v={result.company_context.tech_stack_mentions.join(", ") || null} />
+          </dl>
+        </div>
+      </section>
+
+      <section>
+        <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+          Collector runs
+        </h3>
+        <div className="space-y-2">
+          {result.runs.map((run) => (
+            <div
+              key={run.run_id}
+              className="rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm dark:border-zinc-800 dark:bg-zinc-950"
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-medium text-zinc-900 dark:text-zinc-100">
+                  {run.collector_name}
+                </span>
+                <StatusBadge status={run.status} />
+              </div>
+              {run.self_heal_events.length > 0 && (
+                <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
+                  Self-healed {run.self_heal_events.length} field(s):{" "}
+                  {run.self_heal_events.map((e) => e.field).join(", ")}
+                </p>
+              )}
+              {run.fields_missing.length > 0 && (
+                <p className="mt-1 text-xs text-zinc-500">
+                  Missing: {run.fields_missing.join(", ")}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function Row({ k, v }: { k: string; v: string | null }) {
+  return (
+    <div className="flex gap-2">
+      <dt className="w-28 shrink-0 text-zinc-500 dark:text-zinc-500">{k}</dt>
+      <dd>{v || "—"}</dd>
+    </div>
+  );
+}
+
+function StatusBadge({ status }: { status: string }) {
+  const styles: Record<string, string> = {
+    success: "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400",
+    partial: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400",
+    failed: "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400",
+  };
+  return (
+    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${styles[status] ?? ""}`}>
+      {status}
+    </span>
   );
 }

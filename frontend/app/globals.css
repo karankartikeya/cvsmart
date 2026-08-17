@@ -24,3 +24,29 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.input {
+  width: 100%;
+  border-radius: 0.5rem;
+  border: 1px solid rgb(228 228 231);
+  background: white;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  color: rgb(24 24 27);
+}
+
+.input:focus {
+  outline: 2px solid rgb(24 24 27);
+  outline-offset: 1px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .input {
+    border-color: rgb(39 39 42);
+    background: rgb(9 9 11);
+    color: rgb(244 244 245);
+  }
+  .input:focus {
+    outline-color: rgb(244 244 245);
+  }
+}
