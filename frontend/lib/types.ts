@@ -38,9 +38,14 @@ export interface CollectorRun {
   finished_at: string | null;
 }
 
-export interface CoverLetterResponse {
+export interface CoverLetterResult {
   cover_letter: string;
   job_posting: JobPosting;
-  company_context: CompanyContext;
+  job_url: string;
+}
+
+export interface CoverLetterResponse {
+  results: CoverLetterResult[];
+  company_context: CompanyContext | null;
   runs: CollectorRun[];
 }

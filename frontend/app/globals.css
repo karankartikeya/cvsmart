@@ -1,52 +1,169 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Colors */
+  --color-notion-blue: #0075de;
+  --color-paper-warmth: #f6f5f4;
+  --color-pure-white: #ffffff;
+  --color-ink-black: #000000;
+  --color-stone: #757575;
+  --color-graphite: #615d59;
+  --color-slate: #696969;
+  --color-sky-tint: #e6f3fe;
+  --color-marigold: #ffb110;
+  --color-coral: #f64932;
+  --color-signal-blue: #097fe8;
+  --color-sky-wash: #62aef0;
+  --color-midnight-ink: #02093a;
+  --color-peach: #f6d5b8;
+
+  --background: var(--color-paper-warmth);
+  --foreground: var(--color-ink-black);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-notion-blue: var(--color-notion-blue);
+  --color-paper-warmth: var(--color-paper-warmth);
+  --color-sky-tint: var(--color-sky-tint);
+  --color-marigold: var(--color-marigold);
+  --color-coral: var(--color-coral);
+  --color-signal-blue: var(--color-signal-blue);
+  --color-sky-wash: var(--color-sky-wash);
+  --color-midnight-ink: var(--color-midnight-ink);
+  --color-peach: var(--color-peach);
+  --font-sans: var(--font-notioninter);
+  --font-serif: var(--font-lyon-text);
+  --font-handwritten: var(--font-handwritten);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-notioninter), ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-editorial {
+  font-family: var(--font-lyon-text), Georgia, serif;
+}
+
+.font-handwritten {
+  font-family: var(--font-handwritten), cursive;
+}
+
+.step-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  border: 2px solid var(--color-notion-blue);
+  background: var(--color-pure-white);
+  color: var(--color-notion-blue);
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  aspect-ratio: 1.6 / 1;
+  width: 100%;
+  border-radius: 12px;
+  border: 2px dashed rgba(0, 0, 0, 0.15);
+  background: var(--color-sky-tint);
+  color: rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  transition: border-color 200ms ease, background-color 200ms ease;
+}
+
+.dropzone:hover,
+.dropzone.dropzone-active {
+  border-color: var(--color-notion-blue);
+  background: #d8ecfd;
 }
 
 .input {
   width: 100%;
-  border-radius: 0.5rem;
-  border: 1px solid rgb(228 228 231);
-  background: white;
-  padding: 0.625rem 0.875rem;
-  font-size: 0.875rem;
-  color: rgb(24 24 27);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: var(--color-pure-white);
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--color-ink-black);
+}
+
+.input::placeholder {
+  color: rgba(0, 0, 0, 0.35);
 }
 
 .input:focus {
-  outline: 2px solid rgb(24 24 27);
+  outline: 2px solid var(--color-notion-blue);
   outline-offset: 1px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .input {
-    border-color: rgb(39 39 42);
-    background: rgb(9 9 11);
-    color: rgb(244 244 245);
-  }
-  .input:focus {
-    outline-color: rgb(244 244 245);
-  }
+.btn-primary {
+  background: var(--color-notion-blue);
+  color: var(--color-pure-white);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 12px 24px;
+  transition: background-color 200ms ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #0064bd;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+}
+
+.btn-ghost {
+  background: var(--color-sky-tint);
+  color: var(--color-notion-blue);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 6px 15px;
+  transition: background-color 200ms ease;
+}
+
+.btn-ghost:hover {
+  background: #d8ecfd;
+}
+
+.btn-text {
+  background: transparent;
+  color: rgba(0, 0, 0, 0.95);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 6px 15px;
+  transition: color 200ms ease;
+}
+
+.btn-text:hover {
+  color: var(--color-notion-blue);
+}
+
+.card {
+  background: var(--color-pure-white);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 24px;
+}
+
+.pill {
+  display: inline-block;
+  border-radius: 9999px;
+  padding: 8px 24px;
+  font-weight: 600;
 }
