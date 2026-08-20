@@ -48,15 +48,13 @@ class CollectorRun(BaseModel):
     finished_at: datetime | None = None
 
 
-class CoverLetterRequest(BaseModel):
+class CoverLetterResult(BaseModel):
+    cover_letter: str
+    job_posting: JobPosting
     job_url: str
-    company_url: str
-    candidate_name: str
-    candidate_background: str
 
 
 class CoverLetterResponse(BaseModel):
-    cover_letter: str
-    job_posting: JobPosting
-    company_context: CompanyContext
+    results: list[CoverLetterResult]
+    company_context: CompanyContext | None = None
     runs: list[CollectorRun]
