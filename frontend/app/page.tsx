@@ -7,6 +7,7 @@ import type { CoverLetterResponse } from "@/lib/types";
 import StepSection from "@/components/StepSection";
 import DropzoneUpload from "@/components/DropzoneUpload";
 import JobUrlList from "@/components/JobUrlList";
+import ResultModal from "@/components/ResultModal";
 
 export default function Home() {
   const [resume, setResume] = useState<File | null>(null);
@@ -15,22 +16,30 @@ export default function Home() {
   const [jobUrls, setJobUrls] = useState<string[]>([]);
   const [companyUrl, setCompanyUrl] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Form validation stays inline next to the button; anything that goes wrong
+  // during the request itself is shown in the modal.
+  const [formError, setFormError] = useState<string | null>(null);
+  const [requestError, setRequestError] = useState<string | null>(null);
   const [result, setResult] = useState<CoverLetterResponse | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!resume) {
-      setError("Attach your resume first.");
+      setFormError("Attach your resume first.");
       return;
     }
     if (jobUrls.length === 0) {
-      setError("Add at least one job posting URL.");
+      setFormError("Add at least one job posting URL.");
       return;
     }
-    setLoading(true);
-    setError(null);
+
+    setFormError(null);
+    setRequestError(null);
     setResult(null);
+    setLoading(true);
+    setModalOpen(true);
+
     try {
       const res = await generateCoverLetter({
         job_urls: jobUrls,
@@ -40,7 +49,7 @@ export default function Home() {
       });
       setResult(res);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      setRequestError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -110,17 +119,38 @@ export default function Home() {
               </span>
             </label>
             <button type="submit" disabled={loading} className="btn-primary w-full text-base">
-              {loading ? "Scraping and drafting..." : "GENERATE"}
+              {loading ? "Generating..." : "GENERATE"}
             </button>
-            {error && (
-              <p className="mt-3 rounded-lg bg-coral/10 px-4 py-3 text-sm text-coral">{error}</p>
+            {formError && (
+              <p className="mt-3 rounded-lg bg-coral/10 px-4 py-3 text-sm text-coral">
+                {formError}
+              </p>
             )}
           </StepSection>
         </form>
 
-        {result && <Result result={result} />}
+        {result && !modalOpen && (
+          <div className="pb-20">
+            <button
+              type="button"
+              onClick={() => setModalOpen(true)}
+              className="btn-ghost w-full py-3"
+            >
+              View your {result.results.length > 1 ? "cover letters" : "cover letter"} again
+            </button>
+          </div>
+        )}
       </main>
       <Footer />
+
+      <ResultModal
+        open={modalOpen}
+        loading={loading}
+        error={requestError}
+        result={result}
+        candidateName={candidateName}
+        onClose={() => setModalOpen(false)}
+      />
     </div>
   );
 }
@@ -161,114 +191,6 @@ function Hero() {
         The all-in-one website for your job search
       </p>
     </section>
-  );
-}
-
-function Result({ result }: { result: CoverLetterResponse }) {
-  return (
-    <div className="space-y-8 pb-20">
-      {result.results.map((r, i) => (
-        <section key={r.job_url + i} className="card">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-xs font-semibold uppercase tracking-wide text-stone">
-              Cover letter {result.results.length > 1 ? `#${i + 1}` : ""} —{" "}
-              {r.job_posting.role_title ?? r.job_url}
-            </h2>
-            <CopyButton text={r.cover_letter} />
-          </div>
-          <div className="font-editorial whitespace-pre-wrap text-[15px] leading-[1.65] text-black">
-            {r.cover_letter}
-          </div>
-          <dl className="mt-4 space-y-1.5 border-t border-black/8 pt-4 text-sm text-graphite">
-            <Row k="Role" v={r.job_posting.role_title} />
-            <Row k="Company" v={r.job_posting.company_name} />
-            <Row k="Seniority" v={r.job_posting.seniority_level} />
-            <Row k="Location" v={r.job_posting.location} />
-            <Row k="Salary" v={r.job_posting.salary} />
-          </dl>
-        </section>
-      ))}
-
-      {result.company_context && (
-        <section className="card">
-          <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-stone">
-            Company context extracted
-          </h3>
-          <dl className="space-y-1.5 text-sm text-graphite">
-            <Row k="Mission" v={result.company_context.mission} />
-            <Row
-              k="Announcements"
-              v={result.company_context.recent_announcements.join(", ") || null}
-            />
-            <Row k="Tech stack" v={result.company_context.tech_stack_mentions.join(", ") || null} />
-          </dl>
-        </section>
-      )}
-
-      <section>
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-stone">
-          Collector runs
-        </h3>
-        <div className="space-y-2">
-          {result.runs.map((run) => (
-            <div key={run.run_id} className="card py-3">
-              <div className="flex items-center justify-between">
-                <span className="font-medium text-black">{run.collector_name}</span>
-                <StatusBadge status={run.status} />
-              </div>
-              {run.self_heal_events.length > 0 && (
-                <p className="mt-1 text-xs text-coral">
-                  Self-healed {run.self_heal_events.length} field(s):{" "}
-                  {run.self_heal_events.map((e) => e.field).join(", ")}
-                </p>
-              )}
-              {run.fields_missing.length > 0 && (
-                <p className="mt-1 text-xs text-stone">Missing: {run.fields_missing.join(", ")}</p>
-              )}
-            </div>
-          ))}
-        </div>
-      </section>
-    </div>
-  );
-}
-
-function CopyButton({ text }: { text: string }) {
-  const [copied, setCopied] = useState(false);
-  return (
-    <button
-      type="button"
-      className="btn-ghost text-xs"
-      onClick={() => {
-        navigator.clipboard.writeText(text);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 1500);
-      }}
-    >
-      {copied ? "Copied" : "Copy"}
-    </button>
-  );
-}
-
-function Row({ k, v }: { k: string; v: string | null }) {
-  return (
-    <div className="flex gap-2">
-      <dt className="w-28 shrink-0 text-stone">{k}</dt>
-      <dd>{v || "—"}</dd>
-    </div>
-  );
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    success: "bg-green-100 text-green-700",
-    partial: "bg-marigold/20 text-[#8a5c00]",
-    failed: "bg-coral/10 text-coral",
-  };
-  return (
-    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${styles[status] ?? ""}`}>
-      {status}
-    </span>
   );
 }
 
