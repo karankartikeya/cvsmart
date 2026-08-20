@@ -17,6 +17,31 @@ EXPECTED_FIELDS = [
 ]
 
 
+def _clean_company_name(value: str | None) -> str | None:
+    """Job boards often expose the company as logo alt text ("Discord Logo"),
+    so drop that suffix to get the plain name."""
+    if not value:
+        return value
+    cleaned = value.strip()
+    for suffix in (" Logo", " logo"):
+        if cleaned.endswith(suffix):
+            cleaned = cleaned[: -len(suffix)].strip()
+    return cleaned or None
+
+
+def _dedupe(values: list[str]) -> list[str]:
+    """The collector sometimes repeats the same bullets within a list. Keep
+    first occurrences so the prompt isn't padded with duplicates."""
+    seen: set[str] = set()
+    result: list[str] = []
+    for value in values:
+        key = value.strip().lower()
+        if key and key not in seen:
+            seen.add(key)
+            result.append(value.strip())
+    return result
+
+
 async def collect_job_posting(url: str) -> tuple[JobPosting, CollectorRun]:
     client = BrightDataClient()
     run = CollectorRun(
@@ -56,13 +81,13 @@ async def collect_job_posting(url: str) -> tuple[JobPosting, CollectorRun]:
 
     posting = JobPosting(
         role_title=raw.get("role_title"),
-        company_name=raw.get("company_name"),
+        company_name=_clean_company_name(raw.get("company_name")),
         seniority_level=raw.get("seniority_level"),
         location=raw.get("location"),
         salary=raw.get("salary"),
-        responsibilities=raw.get("responsibilities", []),
-        required_qualifications=raw.get("required_qualifications", []),
-        preferred_qualifications=raw.get("preferred_qualifications", []),
+        responsibilities=_dedupe(raw.get("responsibilities", [])),
+        required_qualifications=_dedupe(raw.get("required_qualifications", [])),
+        preferred_qualifications=_dedupe(raw.get("preferred_qualifications", [])),
         raw_source_url=url,
     )
     return posting, run
