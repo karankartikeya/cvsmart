@@ -63,9 +63,20 @@ Job posting:
 Write the cover letter now."""
 
 
+def _supports_temperature(model: str) -> bool:
+    """GPT-5 and later only accept the default temperature, so the parameter
+    has to be omitted rather than sent with a custom value."""
+    return not model.startswith(("gpt-5", "o1", "o3", "o4"))
+
+
 async def generate_cover_letter(
     job: JobPosting, company: CompanyContext | None, candidate_name: str, resume_text: str
 ) -> str:
+    # Loosen sampling on models that allow it: a slightly higher temperature
+    # gives the varied sentence rhythm that keeps letters from reading like a
+    # template.
+    extra = {"temperature": 0.85} if _supports_temperature(settings.openai_model) else {}
+
     response = await client.chat.completions.create(
         model=settings.openai_model,
         messages=[
@@ -75,6 +86,6 @@ async def generate_cover_letter(
                 "content": _build_user_prompt(job, company, candidate_name, resume_text),
             },
         ],
-        temperature=0.85,
+        **extra,
     )
     return response.choices[0].message.content or ""
