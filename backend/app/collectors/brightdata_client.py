@@ -17,7 +17,7 @@ import httpx
 
 from app.config import settings
 
-BASE_URL = "https://api.brightdata.com/datasets/v3"
+BASE_URL = "https://api.brightdata.com/dca"
 
 
 class BrightDataError(Exception):
@@ -32,45 +32,50 @@ class BrightDataClient:
         }
 
     async def run_collector(
-        self, collector_id: str, target_url: str, poll_interval: float = 3.0, timeout: float = 120.0
+        self, collector_id: str, target_url: str, poll_interval: float = 5.0, timeout: float = 120.0
     ) -> dict[str, Any]:
         """Trigger a Scraper Studio collector run against target_url and
         poll until it completes. Returns the raw structured record."""
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            trigger = await client.post(
-                f"{BASE_URL}/trigger",
-                headers=self._headers,
-                params={"dataset_id": collector_id},
-                json=[{"url": target_url}],
+        if not collector_id:
+            raise BrightDataError(
+                "Collector ID is not configured. Set BRIGHTDATA_JOB_COLLECTOR_ID / "
+                "BRIGHTDATA_COMPANY_COLLECTOR_ID in backend/.env."
             )
-            trigger.raise_for_status()
-            snapshot_id = trigger.json()["snapshot_id"]
 
-            elapsed = 0.0
-            while elapsed < timeout:
-                status_resp = await client.get(
-                    f"{BASE_URL}/progress/{snapshot_id}", headers=self._headers
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                trigger = await client.post(
+                    f"{BASE_URL}/trigger",
+                    headers=self._headers,
+                    params={"collector": collector_id, "queue_next": 1},
+                    json=[{"url": target_url}],
                 )
-                status_resp.raise_for_status()
-                status = status_resp.json().get("status")
+                trigger.raise_for_status()
+                collection_id = trigger.json()["collection_id"]
 
-                if status == "ready":
+                elapsed = 0.0
+                while elapsed < timeout:
                     data_resp = await client.get(
-                        f"{BASE_URL}/snapshot/{snapshot_id}",
+                        f"{BASE_URL}/dataset",
                         headers=self._headers,
-                        params={"format": "json"},
+                        params={"id": collection_id},
                     )
                     data_resp.raise_for_status()
-                    records = data_resp.json()
-                    return records[0] if isinstance(records, list) and records else {}
+                    body = data_resp.json()
 
-                if status == "failed":
-                    raise BrightDataError(f"Collector run {snapshot_id} failed")
+                    if isinstance(body, list):
+                        return body[0] if body else {}
 
-                await asyncio.sleep(poll_interval)
-                elapsed += poll_interval
+                    status = body.get("status") if isinstance(body, dict) else None
+                    if status == "failed" or status == "error":
+                        raise BrightDataError(f"Collector run {collection_id} failed")
 
-            raise BrightDataError(f"Collector run {snapshot_id} timed out after {timeout}s")
+                    await asyncio.sleep(poll_interval)
+                    elapsed += poll_interval
+
+                raise BrightDataError(f"Collector run {collection_id} timed out after {timeout}s")
+        except httpx.HTTPError as exc:
+            raise BrightDataError(f"Bright Data request failed: {exc}") from exc
 
 
 def utcnow() -> datetime:
