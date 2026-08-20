@@ -7,13 +7,17 @@ selector — this is what gives self-healing: when a target site's layout
 changes, Scraper Studio re-locates the field from its description instead
 of failing on a stale selector.
 
-After creating each collector, copy its dataset/collector ID into
-`backend/.env`:
+After creating each collector, copy its **Collector ID** (starts with `c_`,
+found on the collector's overview page) into `backend/.env`:
 
 ```
-BRIGHTDATA_JOB_COLLECTOR_ID=<id from job posting collector>
-BRIGHTDATA_COMPANY_COLLECTOR_ID=<id from company context collector>
+BRIGHTDATA_JOB_COLLECTOR_ID=c_xxxxxxxxxxxxxxxx
+BRIGHTDATA_COMPANY_COLLECTOR_ID=c_xxxxxxxxxxxxxxxx
 ```
+
+The backend also needs a Bright Data **API token** (Account Settings → API
+Tokens, not the same as a per-zone key) in `BRIGHTDATA_API_KEY` — it's sent
+as a bearer token on every `/dca/trigger` and `/dca/dataset` call.
 
 ## Collector 1: job_posting
 
