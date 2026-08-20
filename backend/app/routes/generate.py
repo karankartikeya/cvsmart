@@ -4,7 +4,7 @@ from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
 from app.collectors.brightdata_client import BrightDataError
 from app.collectors.company_context_collector import collect_company_context
-from app.collectors.job_posting_collector import collect_job_posting
+from app.collectors.router import collect_job
 from app.models.schemas import (
     CollectorRun,
     CompanyContext,
@@ -32,7 +32,7 @@ async def generate(
     # JS-heavy and extract poorly, so a failure there must not sink the request.
     try:
         job_results = await asyncio.gather(
-            *(collect_job_posting(url) for url in job_urls)
+            *(collect_job(url) for url in job_urls)
         )
     except BrightDataError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc

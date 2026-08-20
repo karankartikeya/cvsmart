@@ -33,13 +33,16 @@ export default function JobUrlList({
               handleAdd();
             }
           }}
-          placeholder="https://www.linkedin.com/jobs/view/12345678"
+          placeholder="https://www.linkedin.com/jobs/view/3986111804"
           className="input"
         />
         <button type="button" onClick={handleAdd} className="btn-primary shrink-0">
           + ADD
         </button>
       </div>
+      <p className="mt-1.5 text-xs text-stone">
+        Works with LinkedIn and Greenhouse job links.
+      </p>
       {jobUrls.length > 0 && (
         <ol className="mt-3 space-y-2">
           {jobUrls.map((url, i) => (
