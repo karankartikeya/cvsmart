@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { downloadAllAsZip, downloadLetterPdf } from "@/lib/download";
 import type { CoverLetterResponse } from "@/lib/types";
-import LoadingAnimation from "./LoadingAnimation";
+import LoadingAnimation, { type AnimationPhase } from "./LoadingAnimation";
 
 interface ResultModalProps {
   open: boolean;
@@ -73,11 +73,13 @@ export default function ResultModal({
   );
 }
 
-const LOADING_STEPS = [
-  "Reading the job posting",
-  "Matching it against your CV",
-  "Drafting your letter",
-  "Checking it does not read like AI",
+// Each stage names what the backend is doing and which animation fits it:
+// searching while the posting is scraped, printing once drafting starts.
+const LOADING_STEPS: { label: string; phase: AnimationPhase }[] = [
+  { label: "Reading the job posting", phase: "searching" },
+  { label: "Matching it against your CV", phase: "searching" },
+  { label: "Drafting your letter", phase: "printing" },
+  { label: "Checking it does not read like AI", phase: "printing" },
 ];
 
 function LoadingState() {
@@ -95,16 +97,16 @@ function LoadingState() {
 
   return (
     <div className="flex flex-col items-center px-8 py-14 text-center">
-      <LoadingAnimation />
+      <LoadingAnimation phase={LOADING_STEPS[step].phase} />
       <h2 className="mt-6 text-[22px] font-bold tracking-[-0.01em] text-black">
         Writing your cover letter
       </h2>
-      <p className="mt-2 text-sm text-graphite">{LOADING_STEPS[step]}...</p>
+      <p className="mt-2 text-sm text-graphite">{LOADING_STEPS[step].label}...</p>
 
       <div className="mt-6 flex gap-1.5">
-        {LOADING_STEPS.map((label, i) => (
+        {LOADING_STEPS.map((item, i) => (
           <span
-            key={label}
+            key={item.label}
             className="h-1.5 w-8 rounded-full transition-colors duration-500"
             style={{
               background: i <= step ? "var(--color-notion-blue)" : "rgba(0,0,0,0.1)",
