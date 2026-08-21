@@ -9,6 +9,7 @@ schema onto our own JobPosting.
 
 import re
 import uuid
+from urllib.parse import parse_qs, urlparse
 
 import httpx
 
@@ -35,11 +36,27 @@ def is_linkedin_job_url(url: str) -> bool:
 
 
 def _canonical_url(url: str) -> str:
-    """The dataset only resolves the numeric job form, so rewrite the SEO
-    slug variant (…/jobs/view/some-title-at-company-12345) to …/jobs/view/12345."""
+    """Reduce any LinkedIn job URL to the numeric form the dataset resolves.
+
+    People paste several shapes, and only the last one works as-is:
+
+    - /jobs/search-results/?currentJobId=123  (copied from the job search)
+    - /jobs/view/some-title-at-company-123    (the shareable SEO link)
+    - /jobs/view/123
+    """
+    # Search, collection and recommendation pages carry the id in the query
+    # string; the path itself says nothing about which job is open.
+    query = parse_qs(urlparse(url).query)
+    for key in ("currentJobId", "trackingId", "jobId"):
+        values = query.get(key) or []
+        for value in values:
+            if value.isdigit() and len(value) >= 6:
+                return f"https://www.linkedin.com/jobs/view/{value}"
+
     match = re.search(r"/jobs/view/(?:.*?-)?(\d{6,})", url)
     if match:
         return f"https://www.linkedin.com/jobs/view/{match.group(1)}"
+
     return url
 
 
@@ -61,6 +78,18 @@ async def collect_linkedin_job(url: str) -> tuple[JobPosting, CollectorRun]:
         started_at=utcnow(),
     )
 
+    canonical = _canonical_url(url)
+    # A LinkedIn jobs page with no id in it, such as the bare search page,
+    # names no particular job. Say so rather than sending a doomed request.
+    if "/jobs/view/" not in canonical:
+        run.finished_at = utcnow()
+        run.fields_missing = EXPECTED_FIELDS
+        run_log.record(run)
+        raise BrightDataError(
+            "That LinkedIn link does not point at a specific job. Open the job "
+            "first, then copy the URL from the address bar."
+        )
+
     try:
         async with httpx.AsyncClient(timeout=120.0) as client:
             response = await client.post(
@@ -70,7 +99,7 @@ async def collect_linkedin_job(url: str) -> tuple[JobPosting, CollectorRun]:
                     "Content-Type": "application/json",
                 },
                 params={"dataset_id": LINKEDIN_JOBS_DATASET_ID, "format": "json"},
-                json=[{"url": _canonical_url(url)}],
+                json=[{"url": canonical}],
             )
             response.raise_for_status()
             payload = response.json()

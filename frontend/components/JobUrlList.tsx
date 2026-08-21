@@ -41,7 +41,8 @@ export default function JobUrlList({
         </button>
       </div>
       <p className="mt-1.5 text-xs text-stone">
-        Works with LinkedIn and Greenhouse job links.
+        Works with LinkedIn and Greenhouse links. On LinkedIn you can paste the
+        URL straight from the address bar, search results included.
       </p>
       {jobUrls.length > 0 && (
         <ol className="mt-3 space-y-2">
