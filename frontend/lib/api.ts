@@ -28,13 +28,29 @@ export async function generateCoverLetter(input: {
 
 async function extractErrorMessage(res: Response): Promise<string> {
   const text = await res.text();
+
   try {
     const parsed = JSON.parse(text);
     if (typeof parsed.detail === "string") return parsed.detail;
   } catch {
-    // not JSON, fall through to raw text
+    // Not JSON. Most often that means the request never reached the API and
+    // something else answered with an HTML page, so fall through.
   }
-  return text || `Request failed with ${res.status}`;
+
+  // A misconfigured API base sends requests to the site itself, which replies
+  // with a whole HTML document. Showing that verbatim is useless, so name the
+  // likely cause instead.
+  if (text.trimStart().startsWith("<")) {
+    return res.status === 404
+      ? "Could not reach the API. Check that NEXT_PUBLIC_API_BASE points at the backend and includes https://."
+      : `The server returned an unexpected response (${res.status}).`;
+  }
+
+  const trimmed = text.trim();
+  if (!trimmed) return `Request failed with ${res.status}.`;
+
+  // Guard against any other oversized body reaching the modal.
+  return trimmed.length > 300 ? `${trimmed.slice(0, 300)}...` : trimmed;
 }
 
 export async function fetchCollectorHealth(limit = 20): Promise<CollectorRun[]> {

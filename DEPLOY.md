@@ -44,10 +44,15 @@ itself, so nothing else needs configuring.
 
    | Variable | Value |
    |---|---|
-   | `NEXT_PUBLIC_API_BASE` | your Railway URL from step 1, no trailing slash |
+   | `NEXT_PUBLIC_API_BASE` | `https://your-service.up.railway.app` |
+
+   **Include `https://`.** Without the scheme the browser treats the value as
+   a path and posts to `your-site.vercel.app/your-service.up.railway.app/...`,
+   which returns a 404 HTML page. No trailing slash either.
 
    This must be set before the first build. It is inlined at build time, not
-   read at runtime, so changing it later needs a redeploy.
+   read at runtime, so changing it later needs a redeploy from the Deployments
+   tab, not just a save.
 
 5. **Deploy**.
 
