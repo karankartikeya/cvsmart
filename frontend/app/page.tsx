@@ -204,7 +204,7 @@ function Hero() {
       </h1>
 
       <p className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-stone">
-        The all-in-one website for your job search
+        Cover letters, made easy
       </p>
 
       <p className="font-handwritten mx-auto mt-7 max-w-lg text-xl leading-snug text-graphite">
