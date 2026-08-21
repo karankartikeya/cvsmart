@@ -1,27 +1,52 @@
-# Scraper Studio collector setup
+# Bright Data collector setup
 
-Two collectors, created in the Bright Data Scraper Studio dashboard
-(https://brightdata.com → Scraper Studio → New Collector). Each field
-below is defined with a **plain-language description**, not a CSS
-selector — this is what gives self-healing: when a target site's layout
-changes, Scraper Studio re-locates the field from its description instead
-of failing on a stale selector.
+Two ways a job posting gets collected, plus the field specs for each.
 
-After creating each collector, copy its **Collector ID** (starts with `c_`,
-found on the collector's overview page) into `backend/.env`:
+| Path | Used for | Mechanism |
+|---|---|---|
+| Scraper Studio collector | Greenhouse and other job boards | `POST /dca/trigger` → poll `GET /dca/dataset` |
+| Prebuilt LinkedIn Jobs dataset | `linkedin.com/jobs/*` | `POST /datasets/v3/scrape`, synchronous |
+
+Both are Bright Data. The split exists because LinkedIn requires a session
+for most postings and blocks generic collectors; the prebuilt dataset
+(`gd_lpfll7v5hcqtkxl6l`) handles that and returns a fixed schema in one
+call. Everything else goes through Scraper Studio, where the value is that
+fields are described rather than selected.
+
+## Credentials
+
+`BRIGHTDATA_API_KEY` must be the **account API token** (Account Settings →
+API Tokens), not a per-zone key. It is sent as a bearer token on every
+call — `/dca/trigger`, `/dca/dataset`, and `/datasets/v3/scrape` alike.
+
+Collector IDs start with `c_` and are on each collector's overview page:
 
 ```
 BRIGHTDATA_JOB_COLLECTOR_ID=c_xxxxxxxxxxxxxxxx
 BRIGHTDATA_COMPANY_COLLECTOR_ID=c_xxxxxxxxxxxxxxxx
 ```
 
-The backend also needs a Bright Data **API token** (Account Settings → API
-Tokens, not the same as a per-zone key) in `BRIGHTDATA_API_KEY` — it's sent
-as a bearer token on every `/dca/trigger` and `/dca/dataset` call.
+## Creating collectors with the CLI
+
+```bash
+npx -p @brightdata/cli bdata scraper create \
+  --name job_posting \
+  --description "Extract the job title, hiring company, seniority level, location, salary, responsibilities, required qualifications and preferred qualifications from a job posting page."
+
+npx -p @brightdata/cli bdata scraper run  <collector_id> --url <target_url>
+npx -p @brightdata/cli bdata scraper heal <collector_id>
+npx -p @brightdata/cli bdata scraper approve <collector_id>
+```
+
+**Keep descriptions short.** A long, detailed description is rejected with
+a bare `Invalid description` (HTTP 400), which reads like an auth or
+account problem and is not. Several 25-minute builds were burned on this
+during development before the cause was clear. Short descriptions rebuild
+in under a minute.
 
 ## Collector 1: job_posting
 
-Target: any job posting URL (Greenhouse, Lever, LinkedIn, company career page).
+Target: a job posting URL. Built and verified against Greenhouse.
 
 | Field | Type | Description (paste into Scraper Studio) |
 |---|---|---|
@@ -36,7 +61,8 @@ Target: any job posting URL (Greenhouse, Lever, LinkedIn, company career page).
 
 ## Collector 2: company_context
 
-Target: a company's About page, blog, changelog, or careers/culture page.
+Target: a company's About page, blog, changelog, or careers page. Optional
+— leave `BRIGHTDATA_COMPANY_COLLECTOR_ID` blank to disable it.
 
 | Field | Type | Description (paste into Scraper Studio) |
 |---|---|---|
@@ -46,21 +72,80 @@ Target: a company's About page, blog, changelog, or careers/culture page.
 | tech_stack_mentions | list of text | Any programming languages, frameworks, or technologies mentioned as part of their stack or engineering culture |
 | culture_signals | list of text | Statements about company culture, values, work style, or team environment |
 
-## Demoing self-healing
+This one is unreliable in practice. Marketing sites are JS-heavy and the
+extraction frequently returns noise, so company context is treated as a
+bonus: when it is clean it enriches the letter, when it is not the letter
+is written from the posting and CV alone.
 
-For the hackathon demo:
+## LinkedIn path
 
-1. Run collector against a live career page, show the structured JSON output.
-2. Open Scraper Studio's field editor, show the plain-language description
-   (not a selector) driving extraction.
-3. Explain: if the target site ships a redesign (new DOM structure, renamed
-   CSS classes, restructured layout), a traditional selector-based scraper
-   breaks silently. Scraper Studio re-reads the page against the field
-   description and re-locates the data.
-4. If Scraper Studio's dashboard shows a self-heal / re-extraction event
-   log, screen-record one. Otherwise, narrate it against the field
-   description approach and point to the `self_heal_events` surfaced in
-   the app's own `/health` page (populated from `_self_heal_events` in the
-   collector response, if Bright Data returns that metadata — confirm the
-   exact response shape once the collector is live and adjust
-   `job_posting_collector.py` / `company_context_collector.py` accordingly).
+No collector to configure. `linkedin_job_collector.py` calls:
+
+```
+POST https://api.brightdata.com/datasets/v3/scrape
+     ?dataset_id=gd_lpfll7v5hcqtkxl6l&format=json
+Body: [{"url": "https://www.linkedin.com/jobs/view/4453884018"}]
+```
+
+The dataset resolves only the numeric `/jobs/view/<id>` form, so
+`_canonical_url()` normalises whatever the user pasted first:
+
+- `/jobs/search-results/?currentJobId=123` → id from the query string
+- `/jobs/view/some-title-at-company-123` → id from the path
+- `/jobs/view/123` → unchanged
+
+A LinkedIn jobs URL with no id in any of those positions names no
+particular job, and is rejected before a doomed request is sent.
+
+Response fields are mapped onto our own `JobPosting`:
+
+| Dataset field | `JobPosting` field |
+|---|---|
+| `job_title` | `role_title` |
+| `company_name` | `company_name` |
+| `job_seniority_level` | `seniority_level` |
+| `job_location` | `location` |
+| `base_salary` / `salary_standards` | `salary` |
+| `job_summary` | `responsibilities` (split into paragraphs) |
+
+An expired or restricted posting still returns HTTP 200, just with none of
+the job fields, so a missing `job_title` is treated as a failed scrape.
+
+## Self-healing
+
+**What the plain-language approach buys you.** Fields are defined by
+description, not by CSS selector. When a target ships a redesign — renamed
+classes, restructured DOM — a selector-based scraper returns empty strings
+and keeps reporting success. A description-based one re-locates the field
+from what it means.
+
+**What to do when extraction regresses:**
+
+```bash
+npx -p @brightdata/cli bdata scraper heal <collector_id>
+npx -p @brightdata/cli bdata scraper run  <collector_id> --url <target_url>
+npx -p @brightdata/cli bdata scraper approve <collector_id>
+```
+
+**Where healing is not enough, and what we did about it.** The honest
+result from development: the `job_posting` collector was built against
+Greenhouse, and pointed at Lever and Ashby it did not fail — it returned
+the *training* company's name with the record otherwise well-formed. `heal`
+does not fix that, because from the collector's point of view nothing is
+broken; it found a company name.
+
+So the application layer carries the last line of defence
+(`backend/app/collectors/router.py`): a missing `role_title` is treated as
+proof the scrape did not land, and the request is refused rather than
+producing a letter addressed to the wrong employer.
+
+This is the design position worth stating plainly: a scraper that fails
+loudly is a bug report, a scraper that fails plausibly is a user sending an
+application to the wrong company. Self-healing raises the first kind. The
+second kind has to be caught by validating that what came back is about the
+page you asked for.
+
+**What `/health` shows.** Every run is recorded as a `CollectorRun` with
+`status`, `fields_recovered`, `fields_missing`, and `self_heal_events`,
+rendered at `/health`. Runs are kept in memory, so the list resets when the
+backend restarts.
