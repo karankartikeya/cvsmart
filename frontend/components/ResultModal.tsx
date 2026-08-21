@@ -151,7 +151,7 @@ function ResultState({
     setZipping(true);
     track("download_zip", { letters: result.results.length });
     try {
-      await downloadAllAsZip(candidateName, result.results);
+      await downloadAllAsZip(candidateName, result.results, result.contact);
     } finally {
       setZipping(false);
     }
@@ -195,7 +195,7 @@ function ResultState({
                   type="button"
                   onClick={() => {
                     track("download_pdf");
-                    downloadLetterPdf(candidateName, letter);
+                    downloadLetterPdf(candidateName, letter, result.contact);
                   }}
                   className="btn-ghost shrink-0 text-xs"
                 >
@@ -203,8 +203,13 @@ function ResultState({
                 </button>
               </div>
 
-              <div className="font-editorial mt-4 max-h-56 overflow-y-auto whitespace-pre-wrap border-t border-hairline pt-4 text-[14px] leading-[1.65] text-ink">
-                {letter.cover_letter}
+              <div className="mt-4 max-h-56 overflow-y-auto border-t border-hairline pt-4">
+                {letter.subject && (
+                  <p className="mb-3 text-[14px] font-semibold text-ink">{letter.subject}</p>
+                )}
+                <div className="font-editorial whitespace-pre-wrap text-[14px] leading-[1.65] text-ink">
+                  {letter.cover_letter}
+                </div>
               </div>
             </article>
           ))}

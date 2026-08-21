@@ -38,14 +38,29 @@ export interface CollectorRun {
   finished_at: string | null;
 }
 
+export interface ContactDetails {
+  full_name: string;
+  headline: string;
+  street: string;
+  city: string;
+  phone: string;
+  email: string;
+  linkedin: string;
+}
+
 export interface CoverLetterResult {
   cover_letter: string;
   job_posting: JobPosting;
   job_url: string;
+  subject: string;
+  salutation: string;
+  closing: string;
+  language: string;
 }
 
 export interface CoverLetterResponse {
   results: CoverLetterResult[];
   company_context: CompanyContext | null;
   runs: CollectorRun[];
+  contact: ContactDetails | null;
 }
