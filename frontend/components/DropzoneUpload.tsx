@@ -28,7 +28,7 @@ export default function DropzoneUpload({
     >
       {resume ? (
         <>
-          <span className="text-sm font-medium text-black">{resume.name}</span>
+          <span className="text-sm font-medium text-ink">{resume.name}</span>
           <span className="btn-ghost pointer-events-none text-xs">Change</span>
         </>
       ) : (

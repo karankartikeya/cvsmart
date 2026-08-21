@@ -56,7 +56,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-paper-warmth">
+    <div className="min-h-screen">
       <Nav />
       <main className="mx-auto max-w-3xl px-6">
         <Hero />
@@ -65,7 +65,7 @@ export default function Home() {
             <DropzoneUpload resume={resume} setResume={setResume} />
             <div className="mt-4">
               <label className="block">
-                <span className="mb-1.5 block text-sm font-medium text-black">Your name</span>
+                <span className="mb-1.5 block text-sm font-medium text-ink">Your name</span>
                 <input
                   required
                   value={candidateName}
@@ -104,7 +104,7 @@ export default function Home() {
             description="We will generate your personalized AI-proof cover letter right away!"
           >
             <label className="mb-4 block">
-              <span className="mb-1.5 block text-sm font-medium text-black">
+              <span className="mb-1.5 block text-sm font-medium text-ink">
                 Company site URL <span className="font-normal text-stone">(optional)</span>
               </span>
               <input
@@ -157,10 +157,10 @@ export default function Home() {
 
 function Nav() {
   return (
-    <header className="sticky top-0 z-10 bg-paper-warmth/90 backdrop-blur">
+    <header className="sticky top-0 z-10 border-b border-hairline bg-cream/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-6">
-        <span className="text-[15px] font-semibold tracking-tight text-black">
-          CV<span className="text-notion-blue">Cover</span>
+        <span className="text-[16px] font-extrabold tracking-tight text-ink">
+          CV<span className="text-gradient">Cover</span>
         </span>
         <nav className="flex items-center gap-2">
           <Link href="/health" className="btn-text">
@@ -177,18 +177,25 @@ function Nav() {
 
 function Hero() {
   return (
-    <section className="pt-12 pb-10 text-center">
-      <p className="font-handwritten mx-auto max-w-lg text-xl leading-snug text-graphite">
+    <section className="pt-14 pb-12 text-center">
+      <span className="inline-flex items-center gap-2 rounded-full border border-flame/25 bg-white/70 px-4 py-1.5 text-xs font-semibold text-magenta backdrop-blur">
+        <span className="h-1.5 w-1.5 rounded-full bg-flame" />
+        Free · No account · No paywall
+      </span>
+
+      <h1 className="mt-6 text-[64px] leading-[0.95] font-extrabold tracking-[-0.035em] sm:text-[78px]">
+        <span className="text-gradient">CV COVER</span>
+      </h1>
+
+      <p className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-stone">
+        The all-in-one website for your job search
+      </p>
+
+      <p className="font-handwritten mx-auto mt-7 max-w-lg text-xl leading-snug text-graphite">
         Tired of always the same AI-generated cover letters? Ours are
         proof-read, original and low detection, just like grandma used to do
         them.
-        <span className="mt-1 block text-lg text-notion-blue">— made with love</span>
-      </p>
-      <h1 className="mt-6 text-[54px] leading-none font-bold tracking-[-0.02em] text-black">
-        CV COVER
-      </h1>
-      <p className="mt-3 text-xs font-medium uppercase tracking-[0.12em] text-black/40">
-        The all-in-one website for your job search
+        <span className="mt-1 block text-lg text-magenta">— made with love</span>
       </p>
     </section>
   );
@@ -196,7 +203,7 @@ function Hero() {
 
 function Footer() {
   return (
-    <footer className="border-t border-black/8 py-10 text-center text-xs text-stone">
+    <footer className="border-t border-hairline py-10 text-center text-xs text-stone">
       Built for the Into the Scrape-Verse hackathon. Powered by Bright Data
       Scraper Studio.
     </footer>

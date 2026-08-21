@@ -49,7 +49,7 @@ export default function ResultModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-plum/45 p-4 backdrop-blur-sm"
       onClick={(e) => {
         if (e.target === e.currentTarget && !loading) onClose();
       }}
@@ -59,7 +59,7 @@ export default function ResultModal({
         role="dialog"
         aria-modal="true"
         aria-label={loading ? "Generating cover letters" : "Your cover letters"}
-        className="flex max-h-[88vh] w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-white shadow-xl"
+        className="flex max-h-[88vh] w-full max-w-2xl flex-col overflow-hidden rounded-[20px] bg-white shadow-[0_24px_60px_rgba(43,26,23,0.28)]"
       >
         {loading ? (
           <LoadingState />
@@ -98,7 +98,7 @@ function LoadingState() {
   return (
     <div className="flex flex-col items-center px-8 py-14 text-center">
       <LoadingAnimation phase={LOADING_STEPS[step].phase} />
-      <h2 className="mt-6 text-[22px] font-bold tracking-[-0.01em] text-black">
+      <h2 className="mt-6 text-[22px] font-bold tracking-[-0.01em] text-ink">
         Writing your cover letter
       </h2>
       <p className="mt-2 text-sm text-graphite">{LOADING_STEPS[step].label}...</p>
@@ -109,7 +109,7 @@ function LoadingState() {
             key={item.label}
             className="h-1.5 w-8 rounded-full transition-colors duration-500"
             style={{
-              background: i <= step ? "var(--color-notion-blue)" : "rgba(0,0,0,0.1)",
+              background: i <= step ? "var(--gradient-sunset)" : "rgba(43,26,23,0.1)",
             }}
           />
         ))}
@@ -123,7 +123,7 @@ function LoadingState() {
 function ErrorState({ message, onClose }: { message: string; onClose: () => void }) {
   return (
     <div className="px-8 py-12 text-center">
-      <h2 className="text-[22px] font-bold tracking-[-0.01em] text-black">
+      <h2 className="text-[22px] font-bold tracking-[-0.01em] text-ink">
         That did not work
       </h2>
       <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-graphite">{message}</p>
@@ -157,15 +157,15 @@ function ResultState({
 
   return (
     <>
-      <header className="flex items-center justify-between border-b border-black/8 px-6 py-4">
-        <h2 className="text-[17px] font-semibold text-black">
+      <header className="flex items-center justify-between border-b border-hairline px-6 py-4">
+        <h2 className="text-[17px] font-semibold text-ink">
           {multiple ? `${result.results.length} cover letters` : "Your cover letter"}
         </h2>
         <button
           type="button"
           onClick={onClose}
           aria-label="Close"
-          className="text-2xl leading-none text-black/40 transition-colors hover:text-black"
+          className="text-2xl leading-none text-stone transition-colors hover:text-coral"
         >
           ×
         </button>
@@ -176,11 +176,11 @@ function ResultState({
           {result.results.map((letter, i) => (
             <article
               key={`${letter.job_url}-${i}`}
-              className="rounded-xl border border-black/8 p-5"
+              className="rounded-xl border border-hairline p-5"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
-                  <h3 className="truncate text-[15px] font-semibold text-black">
+                  <h3 className="truncate text-[15px] font-semibold text-ink">
                     {letter.job_posting.role_title ?? "Cover letter"}
                   </h3>
                   {letter.job_posting.company_name && (
@@ -198,7 +198,7 @@ function ResultState({
                 </button>
               </div>
 
-              <div className="font-editorial mt-4 max-h-56 overflow-y-auto whitespace-pre-wrap border-t border-black/8 pt-4 text-[14px] leading-[1.65] text-black">
+              <div className="font-editorial mt-4 max-h-56 overflow-y-auto whitespace-pre-wrap border-t border-hairline pt-4 text-[14px] leading-[1.65] text-ink">
                 {letter.cover_letter}
               </div>
             </article>
@@ -206,7 +206,7 @@ function ResultState({
         </div>
       </div>
 
-      <footer className="flex items-center justify-between gap-3 border-t border-black/8 px-6 py-4">
+      <footer className="flex items-center justify-between gap-3 border-t border-hairline px-6 py-4">
         <span className="text-xs text-stone">
           {multiple ? "Download individually or all at once." : "Saved as a PDF."}
         </span>

@@ -1,38 +1,53 @@
 @import "tailwindcss";
 
 :root {
-  /* Colors */
-  --color-notion-blue: #0075de;
-  --color-paper-warmth: #f6f5f4;
-  --color-pure-white: #ffffff;
-  --color-ink-black: #000000;
-  --color-stone: #757575;
-  --color-graphite: #615d59;
-  --color-slate: #696969;
-  --color-sky-tint: #e6f3fe;
-  --color-marigold: #ffb110;
-  --color-coral: #f64932;
-  --color-signal-blue: #097fe8;
-  --color-sky-wash: #62aef0;
-  --color-midnight-ink: #02093a;
-  --color-peach: #f6d5b8;
+  /* Sunset palette: coral through amber to pink, warm and high energy. */
+  --color-coral: #ff5a5f;
+  --color-flame: #ff7847;
+  --color-amber: #ffa62b;
+  --color-gold: #ffc93c;
+  --color-blush: #ff5c8a;
+  --color-magenta: #e8467c;
+  --color-plum: #2d1b2e;
 
-  --background: var(--color-paper-warmth);
-  --foreground: var(--color-ink-black);
+  /* Warm neutrals, tinted toward the accent rather than pure grey. */
+  --color-cream: #fff8f3;
+  --color-shell: #fff1e8;
+  --color-pure-white: #ffffff;
+  --color-ink: #2b1a17;
+  --color-graphite: #6b524b;
+  --color-stone: #9b837b;
+  --color-hairline: rgba(43, 26, 23, 0.09);
+
+  --gradient-sunset: linear-gradient(
+    120deg,
+    var(--color-coral) 0%,
+    var(--color-flame) 35%,
+    var(--color-amber) 70%,
+    var(--color-gold) 100%
+  );
+  --gradient-blush: linear-gradient(120deg, var(--color-magenta) 0%, var(--color-flame) 100%);
+
+  --background: var(--color-cream);
+  --foreground: var(--color-ink);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-notion-blue: var(--color-notion-blue);
-  --color-paper-warmth: var(--color-paper-warmth);
-  --color-sky-tint: var(--color-sky-tint);
-  --color-marigold: var(--color-marigold);
   --color-coral: var(--color-coral);
-  --color-signal-blue: var(--color-signal-blue);
-  --color-sky-wash: var(--color-sky-wash);
-  --color-midnight-ink: var(--color-midnight-ink);
-  --color-peach: var(--color-peach);
+  --color-flame: var(--color-flame);
+  --color-amber: var(--color-amber);
+  --color-gold: var(--color-gold);
+  --color-blush: var(--color-blush);
+  --color-magenta: var(--color-magenta);
+  --color-plum: var(--color-plum);
+  --color-cream: var(--color-cream);
+  --color-shell: var(--color-shell);
+  --color-ink: var(--color-ink);
+  --color-graphite: var(--color-graphite);
+  --color-stone: var(--color-stone);
+  --color-hairline: var(--color-hairline);
   --font-sans: var(--font-notioninter);
   --font-serif: var(--font-lyon-text);
   --font-handwritten: var(--font-handwritten);
@@ -44,12 +59,33 @@ body {
   font-family: var(--font-notioninter), ui-sans-serif, system-ui, sans-serif;
 }
 
+/* Soft sunset wash behind the page so the cream canvas is not flat. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 45% at 15% 0%, rgba(255, 92, 138, 0.16), transparent 70%),
+    radial-gradient(55% 40% at 88% 8%, rgba(255, 166, 43, 0.18), transparent 70%),
+    radial-gradient(50% 45% at 50% 100%, rgba(255, 120, 71, 0.1), transparent 70%);
+}
+
 .font-editorial {
   font-family: var(--font-lyon-text), Georgia, serif;
 }
 
 .font-handwritten {
   font-family: var(--font-handwritten), cursive;
+}
+
+/* Gradient text for display headings. */
+.text-gradient {
+  background: var(--gradient-sunset);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .step-badge {
@@ -60,11 +96,11 @@ body {
   height: 44px;
   flex-shrink: 0;
   border-radius: 9999px;
-  border: 2px solid var(--color-notion-blue);
-  background: var(--color-pure-white);
-  color: var(--color-notion-blue);
+  background: var(--gradient-sunset);
+  color: var(--color-pure-white);
   font-weight: 700;
   font-size: 18px;
+  box-shadow: 0 4px 12px rgba(255, 90, 95, 0.32);
 }
 
 .dropzone {
@@ -72,93 +108,116 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  aspect-ratio: 1.6 / 1;
+  gap: 10px;
+  min-height: 150px;
   width: 100%;
-  border-radius: 12px;
-  border: 2px dashed rgba(0, 0, 0, 0.15);
-  background: var(--color-sky-tint);
-  color: rgba(0, 0, 0, 0.4);
+  padding: 28px 20px;
+  border-radius: 16px;
+  border: 2px dashed rgba(255, 120, 71, 0.4);
+  background: var(--color-shell);
+  color: var(--color-stone);
   cursor: pointer;
-  transition: border-color 200ms ease, background-color 200ms ease;
+  transition: border-color 200ms ease, background-color 200ms ease, transform 200ms ease;
 }
 
 .dropzone:hover,
 .dropzone.dropzone-active {
-  border-color: var(--color-notion-blue);
-  background: #d8ecfd;
+  border-color: var(--color-flame);
+  background: #ffe6d6;
+  transform: translateY(-2px);
 }
 
 .input {
   width: 100%;
-  border-radius: 8px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  border: 1.5px solid var(--color-hairline);
   background: var(--color-pure-white);
-  padding: 10px 14px;
+  padding: 11px 14px;
   font-size: 14px;
-  color: var(--color-ink-black);
+  color: var(--color-ink);
+  transition: border-color 180ms ease, box-shadow 180ms ease;
 }
 
 .input::placeholder {
-  color: rgba(0, 0, 0, 0.35);
+  color: rgba(43, 26, 23, 0.32);
 }
 
 .input:focus {
-  outline: 2px solid var(--color-notion-blue);
-  outline-offset: 1px;
+  outline: none;
+  border-color: var(--color-flame);
+  box-shadow: 0 0 0 3px rgba(255, 120, 71, 0.16);
 }
 
 .btn-primary {
-  background: var(--color-notion-blue);
+  position: relative;
+  background: var(--gradient-sunset);
+  background-size: 160% 100%;
   color: var(--color-pure-white);
   font-size: 14px;
-  font-weight: 500;
-  border-radius: 8px;
+  font-weight: 600;
+  border-radius: 10px;
   padding: 12px 24px;
-  transition: background-color 200ms ease;
+  box-shadow: 0 4px 14px rgba(255, 90, 95, 0.3);
+  transition: background-position 300ms ease, box-shadow 200ms ease, transform 150ms ease;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #0064bd;
+  background-position: 100% 0;
+  box-shadow: 0 6px 20px rgba(255, 90, 95, 0.42);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .btn-primary:disabled {
-  opacity: 0.5;
+  opacity: 0.55;
+  box-shadow: none;
 }
 
 .btn-ghost {
-  background: var(--color-sky-tint);
-  color: var(--color-notion-blue);
+  background: var(--color-shell);
+  color: var(--color-magenta);
   font-size: 14px;
-  font-weight: 500;
-  border-radius: 8px;
-  padding: 6px 15px;
-  transition: background-color 200ms ease;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 7px 16px;
+  transition: background-color 200ms ease, color 200ms ease;
 }
 
 .btn-ghost:hover {
-  background: #d8ecfd;
+  background: #ffe0ea;
+  color: var(--color-coral);
 }
 
 .btn-text {
   background: transparent;
-  color: rgba(0, 0, 0, 0.95);
+  color: var(--color-graphite);
   font-size: 14px;
   font-weight: 500;
-  border-radius: 8px;
-  padding: 6px 15px;
+  border-radius: 10px;
+  padding: 7px 14px;
   transition: color 200ms ease;
 }
 
 .btn-text:hover {
-  color: var(--color-notion-blue);
+  color: var(--color-coral);
 }
 
 .card {
   background: var(--color-pure-white);
-  border-radius: 12px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 18px;
+  border: 1px solid var(--color-hairline);
   padding: 24px;
+  box-shadow: 0 2px 10px rgba(43, 26, 23, 0.04);
+  transition: box-shadow 250ms ease, transform 250ms ease;
+}
+
+/* Step cards lift and warm on hover so the form feels responsive. */
+.card-interactive:hover {
+  box-shadow: 0 10px 28px rgba(255, 120, 71, 0.14);
+  transform: translateY(-2px);
 }
 
 .pill {
@@ -166,4 +225,12 @@ body {
   border-radius: 9999px;
   padding: 8px 24px;
   font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-interactive:hover,
+  .dropzone:hover,
+  .btn-primary:hover:not(:disabled) {
+    transform: none;
+  }
 }

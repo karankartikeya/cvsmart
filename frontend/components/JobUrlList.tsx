@@ -48,16 +48,16 @@ export default function JobUrlList({
           {jobUrls.map((url, i) => (
             <li
               key={`${url}-${i}`}
-              className="flex items-center justify-between gap-2 rounded-lg bg-sky-tint/30 px-3 py-2 text-sm"
+              className="flex items-center justify-between gap-2 rounded-lg bg-shell px-3 py-2 text-sm"
             >
               <span className="truncate">
-                <span className="mr-2 font-medium text-notion-blue">{i + 1}.</span>
+                <span className="mr-2 font-medium text-magenta">{i + 1}.</span>
                 {url}
               </span>
               <button
                 type="button"
                 onClick={() => onRemove(i)}
-                className="shrink-0 text-black/40 transition-colors hover:text-coral"
+                className="shrink-0 text-stone transition-colors hover:text-coral"
                 aria-label="Remove job URL"
               >
                 ×
