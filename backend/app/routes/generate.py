@@ -11,6 +11,7 @@ from app.models.schemas import (
     CoverLetterResponse,
     CoverLetterResult,
 )
+from app.services.contact_details import extract_contact_details
 from app.services.cover_letter import generate_cover_letter
 from app.services.resume_parser import extract_resume_text
 
@@ -50,14 +51,25 @@ async def generate(
     for job, job_run in job_results:
         letter = await generate_cover_letter(job, company, candidate_name, resume_text)
         results.append(
-            CoverLetterResult(cover_letter=letter, job_posting=job, job_url=job_run.target_url)
+            CoverLetterResult(
+                cover_letter=letter.as_plain_text(),
+                job_posting=job,
+                job_url=job_run.target_url,
+                subject=letter.subject,
+                salutation=letter.salutation,
+                closing=letter.closing,
+                language=letter.language,
+            )
         )
         runs.append(job_run)
     if company_run is not None:
         runs.append(company_run)
 
+    contact = extract_contact_details(resume_text, candidate_name)
+
     return CoverLetterResponse(
         results=results,
         company_context=company,
         runs=runs,
+        contact=contact,
     )

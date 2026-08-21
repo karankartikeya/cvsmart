@@ -48,13 +48,32 @@ class CollectorRun(BaseModel):
     finished_at: datetime | None = None
 
 
+class ContactDetails(BaseModel):
+    """Sender block for the letterhead, read out of the uploaded CV."""
+
+    full_name: str = ""
+    headline: str = ""
+    street: str = ""
+    city: str = ""
+    phone: str = ""
+    email: str = ""
+    linkedin: str = ""
+
+
 class CoverLetterResult(BaseModel):
     cover_letter: str
     job_posting: JobPosting
     job_url: str
+    # Parts of a formal letter that sit outside the body text, so the PDF can
+    # lay them out rather than embedding them in the prose.
+    subject: str = ""
+    salutation: str = ""
+    closing: str = ""
+    language: str = "en"
 
 
 class CoverLetterResponse(BaseModel):
     results: list[CoverLetterResult]
     company_context: CompanyContext | None = None
     runs: list[CollectorRun]
+    contact: ContactDetails | None = None
