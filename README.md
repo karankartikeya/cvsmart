@@ -7,9 +7,9 @@ German DIN 5008 letter standard.
 
 Built for the Into the Scrape-Verse hackathon (WeMakeDevs x Bright Data).
 
-- **Live app:** https://cvsmartt.vercel.app
+- **Live app:** https://cvcover.vercel.app
 - **API health:** https://cvsmart-production-599d.up.railway.app/api/ping
-- **Collector health view:** https://cvsmartt.vercel.app/health
+- **Collector health view:** https://cvcover.vercel.app/health
 
 No sign-up, no account, no payment. Paste and go.
 

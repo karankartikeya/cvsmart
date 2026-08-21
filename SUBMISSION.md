@@ -8,9 +8,9 @@ wording to whatever the form actually asks; the substance is here.
 | | |
 |---|---|
 | Repository | https://github.com/karankartikeya/cvsmart |
-| Live app | https://cvsmartt.vercel.app |
+| Live app | https://cvcover.vercel.app |
 | Backend health | https://cvsmart-production-599d.up.railway.app/api/ping |
-| Collector health view | https://cvsmartt.vercel.app/health |
+| Collector health view | https://cvcover.vercel.app/health |
 | Demo video | *(add once recorded — see [DEMO.md](./DEMO.md))* |
 
 ## One-line description
@@ -161,6 +161,6 @@ Draft for the `@WeMakeDevs` / `@Bright Data` social post. Trim to taste.
 > the app surfaces `partial` runs honestly instead of rounding up to a green
 > checkmark.
 >
-> Live: cvsmartt.vercel.app
+> Live: cvcover.vercel.app
 >
 > @WeMakeDevs @Bright Data #ScrapeVerse
