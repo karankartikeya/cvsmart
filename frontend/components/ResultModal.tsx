@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { track } from "@vercel/analytics";
 import { downloadAllAsZip, downloadLetterPdf } from "@/lib/download";
 import type { CoverLetterResponse } from "@/lib/types";
 import LoadingAnimation, { type AnimationPhase } from "./LoadingAnimation";
@@ -148,6 +149,7 @@ function ResultState({
 
   async function handleZip() {
     setZipping(true);
+    track("download_zip", { letters: result.results.length });
     try {
       await downloadAllAsZip(candidateName, result.results);
     } finally {
@@ -191,7 +193,10 @@ function ResultState({
                 </div>
                 <button
                   type="button"
-                  onClick={() => downloadLetterPdf(candidateName, letter)}
+                  onClick={() => {
+                    track("download_pdf");
+                    downloadLetterPdf(candidateName, letter);
+                  }}
                   className="btn-ghost shrink-0 text-xs"
                 >
                   Download PDF

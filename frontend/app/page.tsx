@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { track } from "@vercel/analytics";
 import { generateCoverLetter } from "@/lib/api";
 import type { CoverLetterResponse } from "@/lib/types";
 import StepSection from "@/components/StepSection";
@@ -40,6 +41,13 @@ export default function Home() {
     setLoading(true);
     setModalOpen(true);
 
+    const startedAt = Date.now();
+    track("generate_started", {
+      job_count: jobUrls.length,
+      has_company_url: Boolean(companyUrl),
+      resume_type: resume.name.split(".").pop()?.toLowerCase() ?? "unknown",
+    });
+
     try {
       const res = await generateCoverLetter({
         job_urls: jobUrls,
@@ -48,8 +56,16 @@ export default function Home() {
         resume,
       });
       setResult(res);
+      track("generate_succeeded", {
+        letters: res.results.length,
+        // Bucketed rather than exact so the numbers stay readable in the
+        // Vercel dashboard.
+        seconds: Math.round((Date.now() - startedAt) / 5) * 5,
+      });
     } catch (err) {
-      setRequestError(err instanceof Error ? err.message : "Something went wrong");
+      const message = err instanceof Error ? err.message : "Something went wrong";
+      setRequestError(message);
+      track("generate_failed", { reason: message.slice(0, 100) });
     } finally {
       setLoading(false);
     }

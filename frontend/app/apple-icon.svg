@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <defs>
+    <linearGradient id="sunset" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ff5a5f" />
+      <stop offset="50%" stop-color="#ff7847" />
+      <stop offset="100%" stop-color="#ffc93c" />
+    </linearGradient>
+  </defs>
+
+  <!-- iOS applies its own rounding, so fill the full square. -->
+  <rect width="180" height="180" fill="url(#sunset)" />
+
+  <path
+    d="M56 42h45l25 25v70a8 8 0 0 1-8 8H56a8 8 0 0 1-8-8V50a8 8 0 0 1 8-8z"
+    fill="#ffffff"
+  />
+  <path d="M101 42l25 25h-25z" fill="#ffe0cc" />
+
+  <g stroke="#ff7847" stroke-width="7" stroke-linecap="round">
+    <line x1="67" y1="90" x2="107" y2="90" />
+    <line x1="67" y1="110" x2="107" y2="110" />
+    <line x1="67" y1="130" x2="90" y2="130" />
+  </g>
+</svg>
