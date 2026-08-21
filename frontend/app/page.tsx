@@ -209,8 +209,7 @@ function Hero() {
 
       <p className="font-handwritten mx-auto mt-7 max-w-lg text-xl leading-snug text-graphite">
         Tired of always the same AI-generated cover letters? Ours are
-        proof-read, original and low detection, just like grandma used to do
-        them.
+        proof-read, original and low detection. Made with love, just like grandma used to do them.
         <span className="mt-1 block text-lg text-magenta">— made with love</span>
       </p>
     </section>
