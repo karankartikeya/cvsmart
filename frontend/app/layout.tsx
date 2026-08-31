@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   },
   description: SITE_DESCRIPTION,
   applicationName: "CV Cover",
-  keywords: ["cover letter", "job application", "CV", "resume", "LinkedIn", "Greenhouse"],
+  keywords: ["cover letter", "job application", "CV", "resume", "LinkedIn", "Greenhouse", "join.com"],
   openGraph: {
     type: "website",
     siteName: "CV Cover",
