@@ -1,17 +1,26 @@
 # Bright Data collector setup
 
-Two ways a job posting gets collected, plus the field specs for each.
+Three ways a job posting gets collected, plus the field specs for each.
 
 | Path | Used for | Mechanism |
 |---|---|---|
 | Scraper Studio collector | Greenhouse and other job boards | `POST /dca/trigger` → poll `GET /dca/dataset` |
 | Prebuilt LinkedIn Jobs dataset | `linkedin.com/jobs/*` | `POST /datasets/v3/scrape`, synchronous |
+| join.com schema.org collector | `join.com/companies/<company>/<id>-*` | Fetch the posting, read its JSON-LD `JobPosting` block |
 
-Both are Bright Data. The split exists because LinkedIn requires a session
+The first two are Bright Data. The split exists because LinkedIn requires a session
 for most postings and blocks generic collectors; the prebuilt dataset
 (`gd_lpfll7v5hcqtkxl6l`) handles that and returns a fixed schema in one
 call. Everything else goes through Scraper Studio, where the value is that
 fields are described rather than selected.
+
+join.com needs neither: nothing to configure, no collector id. Its postings
+render client side, so the Scraper Studio collector reads nothing there and
+falls back to its training company (see the `role_title` guard in
+`router.py`) — but every posting embeds a complete schema.org `JobPosting`
+block. `join_job_collector.py` reads that directly, which is exact and
+survives layout changes for free. Company-page links, which name no
+specific job, are rejected before the fetch.
 
 ## Credentials
 

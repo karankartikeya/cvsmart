@@ -46,6 +46,7 @@ job_urls[] + CV file
       |
       v
   collector router  ------> LinkedIn URL?  -> Bright Data LinkedIn Jobs dataset
+      |                     join.com URL?  -> join.com schema.org collector
       |                     anything else  -> Bright Data Scraper Studio collector
       v
   JobPosting (structured)  +  ContactDetails (parsed from CV)
@@ -57,15 +58,22 @@ job_urls[] + CV file
   LetterParts -> DIN 5008 PDF  (+ ZIP when several jobs)
 ```
 
-### Two collection paths, on purpose
+### Three collection paths, on purpose
 
 | URL | Path | Why |
 |---|---|---|
 | `linkedin.com/jobs/...` | Bright Data **prebuilt LinkedIn Jobs dataset** (`gd_lpfll7v5hcqtkxl6l`) | LinkedIn is aggressively hostile to generic scraping and requires a session for most postings. The prebuilt dataset returns a fixed schema synchronously and sidesteps that entirely. |
+| `join.com/companies/<company>/<id>-...` | **join.com collector** reading the posting's schema.org `JobPosting` block | join.com renders its postings client side, so the Scraper Studio collector reads nothing there and falls back to its training company. Every posting ships a structured JSON-LD block with the title, employer, location and full description, which is both exact and stable across layout changes. |
 | everything else | Bright Data **Scraper Studio collector** (`/dca/trigger` → `/dca/dataset`) | Fields are defined in plain language, not CSS selectors, so the collector can be repaired in place when a site's layout shifts. |
 
-Both paths converge on the same `JobPosting` model, so the rest of the app
-does not know or care which one ran.
+All three paths converge on the same `JobPosting` model, so the rest of the
+app does not know or care which one ran.
+
+For join.com the tracking query string is dropped (the posting id lives in
+the path) and the description HTML is split back into responsibilities,
+required and preferred by walking its headings — join.com ships the body as
+one blob, and the letter prompt wants discrete bullets. A link to a company
+page rather than a specific job is rejected up front.
 
 Any LinkedIn URL shape works — the canonical `/jobs/view/123`, the SEO
 `/jobs/view/some-title-at-company-123`, or the one you actually have in
@@ -161,8 +169,8 @@ refuses rather than guessing:
 # backend/app/collectors/router.py
 if not posting.role_title:
     raise BrightDataError(
-        "Could not read this job posting. Greenhouse and LinkedIn links "
-        "work best; other job boards are not supported yet."
+        "Could not read this job posting. Greenhouse, LinkedIn and join.com "
+        "links work best; other job boards are not supported yet."
     )
 ```
 
@@ -220,8 +228,8 @@ Deployment notes are in [DEPLOY.md](./DEPLOY.md).
 
 ## What works, and what does not
 
-**Supported job boards:** LinkedIn (any URL shape) and Greenhouse. Other
-boards are rejected with a clear message rather than silently producing a
+**Supported job boards:** LinkedIn (any URL shape), join.com and Greenhouse.
+Other boards are rejected with a clear message rather than silently producing a
 wrong letter — see the guard above.
 
 **Extraction quality varies by layout.** Some postings return full
@@ -251,6 +259,7 @@ between rehearsal and recording.
 backend/app/collectors/     brightdata_client.py   Scraper Studio trigger/poll
                             router.py              picks a path, guards output
                             linkedin_job_collector.py
+                            join_job_collector.py  schema.org JobPosting
                             job_posting_collector.py
                             company_context_collector.py
 backend/app/services/       cover_letter.py        prompt + JSON-mode call

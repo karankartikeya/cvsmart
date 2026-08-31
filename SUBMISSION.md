@@ -121,7 +121,7 @@ is written from the posting and CV alone rather than absorbing nonsense.
 
 Worth stating rather than hiding — the health view exposes them anyway.
 
-- Supported boards are LinkedIn and Greenhouse. Others are refused with a
+- Supported boards are LinkedIn, join.com and Greenhouse. Others are refused with a
   clear message rather than silently mis-scraped.
 - Extraction completeness varies by layout; incomplete runs report `partial`
   with the missing fields named.
