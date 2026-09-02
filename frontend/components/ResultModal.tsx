@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { track } from "@vercel/analytics";
 import { downloadAllAsZip, downloadLetterPdf } from "@/lib/download";
-import type { CoverLetterResponse, CoverLetterResult } from "@/lib/types";
+import type { ContactDetails, CoverLetterResponse, CoverLetterResult } from "@/lib/types";
 import LoadingAnimation, { type AnimationPhase } from "./LoadingAnimation";
 
 interface ResultModalProps {
@@ -140,6 +140,21 @@ function ErrorState({ message, onClose }: { message: string; onClose: () => void
   );
 }
 
+// Ordered as they appear in the letterhead. `full_name` also signs the letter.
+const CONTACT_FIELDS: {
+  key: keyof ContactDetails;
+  label: string;
+  type: "text" | "email" | "tel";
+}[] = [
+  { key: "full_name", label: "Name", type: "text" },
+  { key: "headline", label: "Headline", type: "text" },
+  { key: "email", label: "Email", type: "email" },
+  { key: "phone", label: "Phone", type: "tel" },
+  { key: "street", label: "Street", type: "text" },
+  { key: "city", label: "Postcode & city", type: "text" },
+  { key: "linkedin", label: "LinkedIn", type: "text" },
+];
+
 function ResultState({
   result,
   candidateName,
@@ -154,6 +169,21 @@ function ResultState({
   // this state, so whatever is on screen is what gets downloaded.
   const [letters, setLetters] = useState(result.results);
   const [editing, setEditing] = useState<number | null>(null);
+  // The letterhead is scraped out of the CV with regexes, so the email or
+  // address it recovered is not always right. Keep it editable; it feeds every
+  // letter's PDF.
+  const [contact, setContact] = useState<ContactDetails>(
+    result.contact ?? {
+      full_name: candidateName,
+      headline: "",
+      street: "",
+      city: "",
+      phone: "",
+      email: "",
+      linkedin: "",
+    }
+  );
+  const [editingContact, setEditingContact] = useState(false);
   const multiple = letters.length > 1;
 
   function updateLetter(index: number, patch: Partial<CoverLetterResult>) {
@@ -166,7 +196,7 @@ function ResultState({
     setZipping(true);
     track("download_zip", { letters: letters.length });
     try {
-      await downloadAllAsZip(candidateName, letters, result.contact);
+      await downloadAllAsZip(contact.full_name || candidateName, letters, contact);
     } finally {
       setZipping(false);
     }
@@ -189,6 +219,53 @@ function ResultState({
       </header>
 
       <div className="flex-1 overflow-y-auto px-6 py-5">
+        <section className="mb-5 rounded-xl border border-hairline p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <h3 className="text-[15px] font-semibold text-ink">Your details</h3>
+              <p className="mt-0.5 text-xs text-stone">
+                Read from your CV — check the email before you send.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setEditingContact((open) => !open)}
+              className="btn-ghost shrink-0 text-xs"
+            >
+              {editingContact ? "Done" : "Edit"}
+            </button>
+          </div>
+
+          {editingContact ? (
+            <div className="mt-4 grid grid-cols-1 gap-3 border-t border-hairline pt-4 sm:grid-cols-2">
+              {CONTACT_FIELDS.map(({ key, label, type }) => (
+                <label key={key} className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-graphite">{label}</span>
+                  <input
+                    type={type}
+                    value={contact[key]}
+                    onChange={(e) =>
+                      setContact((current) => ({ ...current, [key]: e.target.value }))
+                    }
+                    className="w-full rounded-lg border border-hairline px-3 py-2 text-[14px] text-ink outline-none focus:border-coral"
+                  />
+                </label>
+              ))}
+            </div>
+          ) : (
+            <dl className="mt-4 grid grid-cols-1 gap-x-6 gap-y-1 border-t border-hairline pt-4 text-[13px] sm:grid-cols-2">
+              {CONTACT_FIELDS.filter(({ key }) => contact[key].trim()).map(
+                ({ key, label }) => (
+                  <div key={key} className="flex gap-2">
+                    <dt className="shrink-0 text-stone">{label}</dt>
+                    <dd className="truncate text-ink">{contact[key]}</dd>
+                  </div>
+                )
+              )}
+            </dl>
+          )}
+        </section>
+
         <div className="space-y-5">
           {letters.map((letter, i) => (
             <article
@@ -218,7 +295,7 @@ function ResultState({
                     type="button"
                     onClick={() => {
                       track("download_pdf");
-                      downloadLetterPdf(candidateName, letter, result.contact);
+                      downloadLetterPdf(contact.full_name || candidateName, letter, contact);
                     }}
                     className="btn-ghost text-xs"
                   >
