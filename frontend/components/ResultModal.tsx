@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { track } from "@vercel/analytics";
 import { downloadAllAsZip, downloadLetterPdf } from "@/lib/download";
-import type { CoverLetterResponse } from "@/lib/types";
+import type { ContactDetails, CoverLetterResponse, CoverLetterResult } from "@/lib/types";
 import LoadingAnimation, { type AnimationPhase } from "./LoadingAnimation";
 
 interface ResultModalProps {
@@ -67,7 +67,12 @@ export default function ResultModal({
         ) : error ? (
           <ErrorState message={error} onClose={onClose} />
         ) : result ? (
-          <ResultState result={result} candidateName={candidateName} onClose={onClose} />
+          <ResultState
+            key={result.results.map((r) => r.job_url).join("|")}
+            result={result}
+            candidateName={candidateName}
+            onClose={onClose}
+          />
         ) : null}
       </div>
     </div>
@@ -135,6 +140,21 @@ function ErrorState({ message, onClose }: { message: string; onClose: () => void
   );
 }
 
+// Ordered as they appear in the letterhead. `full_name` also signs the letter.
+const CONTACT_FIELDS: {
+  key: keyof ContactDetails;
+  label: string;
+  type: "text" | "email" | "tel";
+}[] = [
+  { key: "full_name", label: "Name", type: "text" },
+  { key: "headline", label: "Headline", type: "text" },
+  { key: "email", label: "Email", type: "email" },
+  { key: "phone", label: "Phone", type: "tel" },
+  { key: "street", label: "Street", type: "text" },
+  { key: "city", label: "Postcode & city", type: "text" },
+  { key: "linkedin", label: "LinkedIn", type: "text" },
+];
+
 function ResultState({
   result,
   candidateName,
@@ -145,13 +165,38 @@ function ResultState({
   onClose: () => void;
 }) {
   const [zipping, setZipping] = useState(false);
-  const multiple = result.results.length > 1;
+  // Letters stay editable in place: the PDF is rendered in the browser from
+  // this state, so whatever is on screen is what gets downloaded.
+  const [letters, setLetters] = useState(result.results);
+  const [editing, setEditing] = useState<number | null>(null);
+  // The letterhead is scraped out of the CV with regexes, so the email or
+  // address it recovered is not always right. Keep it editable; it feeds every
+  // letter's PDF.
+  const [contact, setContact] = useState<ContactDetails>(
+    result.contact ?? {
+      full_name: candidateName,
+      headline: "",
+      street: "",
+      city: "",
+      phone: "",
+      email: "",
+      linkedin: "",
+    }
+  );
+  const [editingContact, setEditingContact] = useState(false);
+  const multiple = letters.length > 1;
+
+  function updateLetter(index: number, patch: Partial<CoverLetterResult>) {
+    setLetters((current) =>
+      current.map((letter, i) => (i === index ? { ...letter, ...patch } : letter))
+    );
+  }
 
   async function handleZip() {
     setZipping(true);
-    track("download_zip", { letters: result.results.length });
+    track("download_zip", { letters: letters.length });
     try {
-      await downloadAllAsZip(candidateName, result.results, result.contact);
+      await downloadAllAsZip(contact.full_name || candidateName, letters, contact);
     } finally {
       setZipping(false);
     }
@@ -161,7 +206,7 @@ function ResultState({
     <>
       <header className="flex items-center justify-between border-b border-hairline px-6 py-4">
         <h2 className="text-[17px] font-semibold text-ink">
-          {multiple ? `${result.results.length} cover letters` : "Your cover letter"}
+          {multiple ? `${letters.length} cover letters` : "Your cover letter"}
         </h2>
         <button
           type="button"
@@ -174,8 +219,55 @@ function ResultState({
       </header>
 
       <div className="flex-1 overflow-y-auto px-6 py-5">
+        <section className="mb-5 rounded-xl border border-hairline p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <h3 className="text-[15px] font-semibold text-ink">Your details</h3>
+              <p className="mt-0.5 text-xs text-stone">
+                Read from your CV — check the email before you send.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setEditingContact((open) => !open)}
+              className="btn-ghost shrink-0 text-xs"
+            >
+              {editingContact ? "Done" : "Edit"}
+            </button>
+          </div>
+
+          {editingContact ? (
+            <div className="mt-4 grid grid-cols-1 gap-3 border-t border-hairline pt-4 sm:grid-cols-2">
+              {CONTACT_FIELDS.map(({ key, label, type }) => (
+                <label key={key} className="flex flex-col gap-1">
+                  <span className="text-xs font-medium text-graphite">{label}</span>
+                  <input
+                    type={type}
+                    value={contact[key]}
+                    onChange={(e) =>
+                      setContact((current) => ({ ...current, [key]: e.target.value }))
+                    }
+                    className="w-full rounded-lg border border-hairline px-3 py-2 text-[14px] text-ink outline-none focus:border-coral"
+                  />
+                </label>
+              ))}
+            </div>
+          ) : (
+            <dl className="mt-4 grid grid-cols-1 gap-x-6 gap-y-1 border-t border-hairline pt-4 text-[13px] sm:grid-cols-2">
+              {CONTACT_FIELDS.filter(({ key }) => contact[key].trim()).map(
+                ({ key, label }) => (
+                  <div key={key} className="flex gap-2">
+                    <dt className="shrink-0 text-stone">{label}</dt>
+                    <dd className="truncate text-ink">{contact[key]}</dd>
+                  </div>
+                )
+              )}
+            </dl>
+          )}
+        </section>
+
         <div className="space-y-5">
-          {result.results.map((letter, i) => (
+          {letters.map((letter, i) => (
             <article
               key={`${letter.job_url}-${i}`}
               className="rounded-xl border border-hairline p-5"
@@ -191,25 +283,60 @@ function ResultState({
                     </p>
                   )}
                 </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    track("download_pdf");
-                    downloadLetterPdf(candidateName, letter, result.contact);
-                  }}
-                  className="btn-ghost shrink-0 text-xs"
-                >
-                  Download PDF
-                </button>
+                <div className="flex shrink-0 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditing(editing === i ? null : i)}
+                    className="btn-ghost text-xs"
+                  >
+                    {editing === i ? "Done" : "Edit"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      track("download_pdf");
+                      downloadLetterPdf(contact.full_name || candidateName, letter, contact);
+                    }}
+                    className="btn-ghost text-xs"
+                  >
+                    Download PDF
+                  </button>
+                </div>
               </div>
 
-              <div className="mt-4 max-h-56 overflow-y-auto border-t border-hairline pt-4">
-                {letter.subject && (
-                  <p className="mb-3 text-[14px] font-semibold text-ink">{letter.subject}</p>
+              <div className="mt-4 border-t border-hairline pt-4">
+                {editing === i ? (
+                  <div className="space-y-3">
+                    <input
+                      type="text"
+                      value={letter.subject}
+                      onChange={(e) => updateLetter(i, { subject: e.target.value })}
+                      placeholder="Subject line"
+                      aria-label="Subject line"
+                      className="w-full rounded-lg border border-hairline px-3 py-2 text-[14px] font-semibold text-ink outline-none focus:border-coral"
+                    />
+                    <textarea
+                      value={letter.cover_letter}
+                      onChange={(e) => updateLetter(i, { cover_letter: e.target.value })}
+                      aria-label="Cover letter text"
+                      rows={14}
+                      className="font-editorial w-full resize-y rounded-lg border border-hairline px-3 py-2 text-[14px] leading-[1.65] text-ink outline-none focus:border-coral"
+                    />
+                    <p className="text-xs text-stone">
+                      Edits apply to the PDF you download. Keep blank lines between
+                      paragraphs.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="max-h-56 overflow-y-auto">
+                    {letter.subject && (
+                      <p className="mb-3 text-[14px] font-semibold text-ink">{letter.subject}</p>
+                    )}
+                    <div className="font-editorial whitespace-pre-wrap text-[14px] leading-[1.65] text-ink">
+                      {letter.cover_letter}
+                    </div>
+                  </div>
                 )}
-                <div className="font-editorial whitespace-pre-wrap text-[14px] leading-[1.65] text-ink">
-                  {letter.cover_letter}
-                </div>
               </div>
             </article>
           ))}
