@@ -18,7 +18,9 @@
       "Bash(rm -rf .verify)",
       "Bash(pdftoppm -png -r 80 Coverit-Pitch-Deck.pdf pg)",
       "Bash(pdftoppm -png -r 55 Coverit-Pitch-Deck.pdf pg)",
-      "Bash(git rev-list *)"
+      "Bash(git rev-list *)",
+      "Bash(curl -s localhost:3000)",
+      "Bash(grep -oE '<header.{0,400}')"
     ],
     "additionalDirectories": [
       "/Users/karankartikeya/cvsmart/pitch"
