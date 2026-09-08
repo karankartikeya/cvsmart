@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.routes import generate, health
 
-app = FastAPI(title="CV Cover")
+app = FastAPI(title="Coverit")
 
 # Local development is always allowed; deployed frontends are added through
 # ALLOWED_ORIGINS so the hosted site is not locked out by a hardcoded list.

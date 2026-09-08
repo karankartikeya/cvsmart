@@ -200,7 +200,7 @@ function Hero() {
       </span>
 
       <h1 className="mt-6 text-[64px] leading-[0.95] font-extrabold tracking-[-0.035em] sm:text-[78px]">
-        <span className="text-gradient">CV COVER</span>
+        <span className="text-gradient">COVERIT</span>
       </h1>
 
       <p className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-stone">
