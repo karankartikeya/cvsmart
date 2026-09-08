@@ -8,9 +8,9 @@ wording to whatever the form actually asks; the substance is here.
 | | |
 |---|---|
 | Repository | https://github.com/karankartikeya/cvsmart |
-| Live app | https://cvcover.vercel.app |
+| Live app | https://coveritt.vercel.app |
 | Backend health | https://cvsmart-production-599d.up.railway.app/api/ping |
-| Collector health view | https://cvcover.vercel.app/health |
+| Collector health view | https://coveritt.vercel.app/health |
 | Demo video | *(add once recorded — see [DEMO.md](./DEMO.md))* |
 
 ## One-line description
@@ -21,7 +21,7 @@ Data.
 
 ## What it does (short)
 
-CV Cover turns a CV plus a list of job URLs into one tailored cover letter
+Coverit turns a CV plus a list of job URLs into one tailored cover letter
 per posting, downloadable as a DIN 5008 formatted PDF or a ZIP. No account,
 no payment.
 
@@ -136,7 +136,7 @@ Worth stating rather than hiding — the health view exposes them anyway.
 
 Draft for the `@WeMakeDevs` / `@Bright Data` social post. Trim to taste.
 
-> Spent this week building **CV Cover** for the Into the Scrape-Verse
+> Spent this week building **Coverit** for the Into the Scrape-Verse
 > hackathon: upload a CV, paste job links, get a formal cover letter per
 > posting — written from the actual job ad, not a guess.
 >
@@ -161,6 +161,6 @@ Draft for the `@WeMakeDevs` / `@Bright Data` social post. Trim to taste.
 > the app surfaces `partial` runs honestly instead of rounding up to a green
 > checkmark.
 >
-> Live: cvcover.vercel.app
+> Live: coveritt.vercel.app
 >
 > @WeMakeDevs @Bright Data #ScrapeVerse

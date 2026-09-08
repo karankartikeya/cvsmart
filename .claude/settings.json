@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" --headless --disable-gpu --no-pdf-header-footer --print-to-pdf=Coverit-Pitch-Deck.pdf --virtual-time-budget=15000 \".deck-inlined.html\")",
+      "Bash(python3 -c ' *)",
+      "Bash(\"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome\" --headless --disable-gpu --no-pdf-header-footer --print-to-pdf-no-header --print-to-pdf=test1.pdf --virtual-time-budget=15000 --window-size=1280,720 \".deck-inlined.html\")",
+      "Bash(python3 -c \"import websockets\")",
+      "Bash(python3 -c \"import requests\")",
+      "Bash(python3 topdf.py)",
+      "Bash(python3 measure.py)",
+      "Bash(awk '$0 ~ /OVERFLOW/ {print} END {print \"overflow check done\"}')",
+      "Bash(python3 shot.py)",
+      "Bash(rm -rf .chrome-profile .chrome-profile2 .cp3 chk*.png p1.png test1.pdf measure.py shot.py .deck-inlined.html && ls -la)",
+      "Bash(python3 -c \"import pptx; print\\('python-pptx', pptx.__version__\\)\")",
+      "Bash(pip3 install *)",
+      "Bash(python3 topptx.py)",
+      "Bash(soffice --headless --convert-to pdf --outdir .verify Coverit-Pitch-Deck.pptx)",
+      "Bash(rm -rf .verify)",
+      "Bash(pdftoppm -png -r 80 Coverit-Pitch-Deck.pdf pg)",
+      "Bash(pdftoppm -png -r 55 Coverit-Pitch-Deck.pdf pg)",
+      "Bash(perl -pi -e 's/Coverit-Pitch-Deck/Coverit-Pitch-Deck/g' pitch/topptx.py pitch/topdf.py .claude/settings.json)"
+    ],
+    "additionalDirectories": [
+      "/Users/karankartikeya/cvsmart/pitch"
+    ]
+  }
+}

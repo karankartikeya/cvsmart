@@ -1,4 +1,4 @@
-# Deploying CV Cover
+# Deploying Coverit
 
 Two services: the FastAPI backend on Railway, the Next.js frontend on Vercel.
 Deploy the backend first, since the frontend needs its URL.

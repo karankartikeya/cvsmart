@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Coverit — Pitch Deck</title>
+<style>
+  @page { size: 13.333in 7.5in; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1614;
+    --muted: #6b625c;
+    --faint: #9a918b;
+    --rule: #e8e0da;
+    --paper: #fffdfb;
+    --warm: #fdf6f0;
+    --coral: #f4674c;
+    --amber: #f7a34b;
+    --green: #2f8f5b;
+    --red: #c8402c;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    background: #555;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .slide {
+    width: 1280px; height: 720px;
+    padding: 62px 76px;
+    background: var(--paper);
+    position: relative;
+    overflow: hidden;
+    page-break-after: always;
+    break-after: page;
+    display: flex; flex-direction: column;
+  }
+  .slide:last-child { page-break-after: auto; break-after: auto; }
+
+  @media print {
+    body { background: #fff; padding: 0; }
+    .slide {
+      margin: 0; box-shadow: none;
+      height: 720px; min-height: 720px; max-height: 720px;
+      overflow: hidden;
+    }
+  }
+
+  @media screen {
+    .slide { margin: 0 auto 26px; box-shadow: 0 8px 30px rgba(0,0,0,.28); }
+    body { padding: 26px 0; }
+  }
+
+  /* ---------- shared type ---------- */
+  .kicker {
+    font-size: 12.5px; font-weight: 700; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--coral); margin-bottom: 16px;
+  }
+  h1 { font-size: 46px; line-height: 1.1; letter-spacing: -.022em; font-weight: 750; }
+  h2 { font-size: 37px; line-height: 1.14; letter-spacing: -.02em; font-weight: 720; margin-bottom: 10px; }
+  .sub { font-size: 18.5px; color: var(--muted); line-height: 1.5; max-width: 900px; }
+  p { font-size: 16.5px; line-height: 1.62; color: var(--muted); }
+  strong { color: var(--ink); font-weight: 650; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  .slide-no {
+    position: absolute; bottom: 30px; right: 40px;
+    font-size: 11.5px; color: var(--faint); font-variant-numeric: tabular-nums;
+  }
+  .foot {
+    position: absolute; bottom: 28px; left: 76px;
+    font-size: 11.5px; color: var(--faint);
+  }
+  .body { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  .head-rule { height: 3px; width: 54px; background: var(--coral); border-radius: 2px; margin-bottom: 22px; }
+
+  /* ---------- cover ---------- */
+  .cover {
+    background: linear-gradient(150deg, #fff2ea 0%, #fdf6f0 42%, #fff8f0 100%);
+    justify-content: center;
+  }
+  .wordmark { font-size: 92px; font-weight: 800; letter-spacing: -.038em; line-height: 1; }
+  .wordmark span { background: linear-gradient(96deg, var(--coral), var(--amber)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .cover .tagline { font-size: 25px; color: var(--muted); margin-top: 22px; font-weight: 400; letter-spacing: -.008em; }
+  .cover .meta { margin-top: 54px; font-size: 15px; color: var(--faint); line-height: 1.9; }
+  .cover .meta b { color: var(--ink); font-weight: 620; }
+  .pill {
+    display: inline-block; padding: 7px 15px; border-radius: 100px;
+    background: #fff; border: 1px solid var(--rule);
+    font-size: 12.5px; color: var(--coral); font-weight: 640; margin-bottom: 30px;
+  }
+
+  /* ---------- layout helpers ---------- */
+  .cols { display: grid; gap: 26px; }
+  .c2 { grid-template-columns: 1fr 1fr; }
+  .c3 { grid-template-columns: repeat(3, 1fr); }
+  .c4 { grid-template-columns: repeat(4, 1fr); }
+  .split { display: grid; grid-template-columns: 1.05fr .95fr; gap: 40px; align-items: center; flex: 1; }
+
+  .card {
+    background: #fff; border: 1px solid var(--rule); border-radius: 13px;
+    padding: 22px 23px;
+  }
+  .card h3 { font-size: 17px; font-weight: 680; margin-bottom: 8px; letter-spacing: -.01em; }
+  .card p { font-size: 14.5px; line-height: 1.55; }
+  .card .big {
+    font-size: 40px; font-weight: 750; letter-spacing: -.025em; line-height: 1;
+    margin-bottom: 7px;
+  }
+  .card .lbl { font-size: 12.5px; color: var(--faint); text-transform: uppercase; letter-spacing: .08em; font-weight: 620; }
+  .accent { color: var(--coral); }
+  .warmcard { background: var(--warm); border-color: #f5e4d8; }
+
+  /* ---------- tables ---------- */
+  table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  th {
+    text-align: left; font-size: 11.5px; text-transform: uppercase; letter-spacing: .09em;
+    color: var(--faint); font-weight: 680; padding: 0 12px 9px 0; border-bottom: 1.5px solid var(--rule);
+  }
+  td { padding: 10px 12px 10px 0; border-bottom: 1px solid #f2ece7; color: var(--muted); vertical-align: top; line-height: 1.45; }
+  td:first-child { color: var(--ink); font-weight: 600; }
+  tr:last-child td { border-bottom: none; }
+  .r { text-align: right; font-variant-numeric: tabular-nums; }
+  .tot td { border-top: 2px solid var(--ink); border-bottom: none; color: var(--ink); font-weight: 700; padding-top: 11px; }
+
+  code, .mono {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+    font-size: .93em;
+  }
+  pre.codeblock { white-space: pre; margin: 0; }
+  .codeblock {
+    background: #2a2320; color: #f0e6de; border-radius: 11px;
+    padding: 19px 21px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13px; line-height: 1.62; overflow: hidden;
+  }
+  .codeblock .cm { color: #9c8d82; }
+  .codeblock .ky { color: #f7a34b; }
+  .codeblock .st { color: #8fd6a0; }
+  .codeblock .rd { color: #ff8f7a; }
+
+  .tag {
+    display: inline-block; padding: 3px 10px; border-radius: 100px;
+    font-size: 11.5px; font-weight: 650; letter-spacing: .01em;
+  }
+  .tag-part { background: #fdf0dd; color: #9a6510; }
+  .tag-ok { background: #e4f4ea; color: var(--green); }
+  .tag-bad { background: #fbe6e2; color: var(--red); }
+
+  ul { list-style: none; }
+  li { font-size: 16px; line-height: 1.5; color: var(--muted); padding-left: 22px; position: relative; margin-bottom: 11px; }
+  li:before { content: ""; position: absolute; left: 3px; top: 9px; width: 6px; height: 6px; border-radius: 50%; background: var(--amber); }
+  li b { color: var(--ink); font-weight: 640; }
+
+  .shot {
+    width: 100%; border-radius: 11px; border: 1px solid var(--rule);
+    display: block; box-shadow: 0 5px 18px rgba(0,0,0,.09);
+  }
+
+  .note {
+    font-size: 12.5px; color: var(--faint); line-height: 1.5;
+    border-left: 2.5px solid var(--rule); padding-left: 12px; margin-top: 16px;
+  }
+  .assume {
+    display: inline-block; font-size: 10.5px; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: #9a6510; background: #fdf0dd;
+    padding: 4px 10px; border-radius: 4px;
+  }
+
+  .flow { display: flex; align-items: stretch; gap: 11px; }
+  .flow-box {
+    flex: 1; background: #fff; border: 1px solid var(--rule); border-radius: 11px;
+    padding: 15px 14px; text-align: center;
+  }
+  .flow-box .t { font-size: 14px; font-weight: 670; margin-bottom: 5px; }
+  .flow-box .d { font-size: 12px; color: var(--faint); line-height: 1.42; }
+  .arrow { display: flex; align-items: center; color: var(--faint); font-size: 17px; }
+</style>
+</head>
+<body>
+
+<!-- 1 — COVER -->
+<section class="slide cover">
+  <div class="pill">Pre-seed · 2026</div>
+  <div class="wordmark">CV <span>COVER</span></div>
+  <div class="tagline">Cover letters written from the real job posting,<br>not from a guess.</div>
+  <div class="meta">
+    <b>coveritt.vercel.app</b> &nbsp;·&nbsp; live, deployed, no account required<br>
+    Built on Bright Data · Into the Scrape-Verse (WeMakeDevs × Bright Data)
+  </div>
+  <div class="slide-no">01</div>
+</section>
+
+<!-- 2 — PROBLEM -->
+<section class="slide">
+  <div class="kicker">The problem</div>
+  <div class="head-rule"></div>
+  <h2>Applying to ten jobs means writing ten cover letters.</h2>
+  <p class="sub">So people paste the ad into ChatGPT. That produces a letter that reads like ChatGPT wrote it: the same three-paragraph shape, the same "I am writing to express my enthusiasm", and an increasingly detectable statistical fingerprint that applicant tracking systems now screen for.</p>
+
+  <div class="cols c3" style="margin-top: 38px;">
+    <div class="card">
+      <div class="big accent">10×</div>
+      <div class="lbl">Letters per search</div>
+      <p style="margin-top:9px">Every posting wants a letter that cites <em>that</em> posting. The work scales linearly with applications.</p>
+    </div>
+    <div class="card">
+      <div class="big accent">Generic</div>
+      <div class="lbl">What the shortcut returns</div>
+      <p style="margin-top:9px">A chatbot only sees what you pasted. Miss a detail from the ad, and the letter is filler.</p>
+    </div>
+    <div class="card">
+      <div class="big accent">Flagged</div>
+      <div class="lbl">The new failure mode</div>
+      <p style="margin-top:9px">ATS-side AI detection turns the shortcut into a liability, not just a weak letter.</p>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top:30px"><strong>But the writing is the easy half.</strong> The hard half is acquiring the job posting reliably, as structured data, from a page built for human eyes and redesigned without notice. That acquisition problem is what this company is built around.</div>
+  <div class="slide-no">02</div>
+</section>
+
+<!-- 3 — SOLUTION -->
+<section class="slide">
+  <div class="kicker">The solution</div>
+  <div class="head-rule"></div>
+  <h2>Upload a CV. Paste job links. Get one letter per posting.</h2>
+  <p class="sub" style="margin-bottom:34px">Each letter is drafted from the actual scraped job ad and your real resume, in the posting's own language, and downloads as a formal PDF laid out to the German DIN 5008 letter standard.</p>
+
+  <div class="flow">
+    <div class="flow-box"><div class="t">CV + job URLs</div><div class="d">No account, no payment, no setup</div></div>
+    <div class="arrow">→</div>
+    <div class="flow-box"><div class="t">Collector router</div><div class="d">Picks a scrape path per URL, runs them concurrently</div></div>
+    <div class="arrow">→</div>
+    <div class="flow-box"><div class="t">Structured JobPosting</div><div class="d">Title, company, seniority, location, duties</div></div>
+    <div class="arrow">→</div>
+    <div class="flow-box"><div class="t">Letter draft</div><div class="d">LLM in JSON mode, language-matched</div></div>
+    <div class="arrow">→</div>
+    <div class="flow-box"><div class="t">DIN 5008 PDF</div><div class="d">Single file, or ZIP for a batch</div></div>
+  </div>
+
+  <div class="cols c3" style="margin-top:36px">
+    <div class="card warmcard">
+      <h3>Grounded, not generic</h3>
+      <p>The prompt must cite a named responsibility from the posting <em>and</em> a real project or role from the CV. No filler claims.</p>
+    </div>
+    <div class="card warmcard">
+      <h3>Written to pass as human</h3>
+      <p>No em dashes, no "thrilled to apply", no rule-of-three adjective stacks, deliberately varied sentence length.</p>
+    </div>
+    <div class="card warmcard">
+      <h3>Correct by locale</h3>
+      <p>A German posting produces a German <em>Anschreiben</em> even from an English CV. That is the right behaviour, not a bug.</p>
+    </div>
+  </div>
+  <div class="slide-no">03</div>
+</section>
+
+<!-- 4 — DEMO 1 -->
+<section class="slide">
+  <div class="kicker">Demo · the product</div>
+  <div class="head-rule"></div>
+  <div class="split" style="gap:44px">
+    <div>
+      <h2 style="font-size:33px">Three inputs, one screen.</h2>
+      <p style="margin-top:14px">Drag in a CV, paste the job links, hit generate. There is no onboarding, no signup wall and no pricing page in the way. The entire product is one page and a results modal.</p>
+      <ul style="margin-top:24px">
+        <li><b>Any LinkedIn URL shape works</b> — including the messy one from your address bar with the job id buried in a query string.</li>
+        <li><b>Several jobs at once</b> — scraped concurrently, bundled into a ZIP.</li>
+        <li><b>Letterhead auto-fills</b> — name, address, phone, email and LinkedIn are parsed out of the CV itself.</li>
+      </ul>
+      <div class="note">Live at coveritt.vercel.app — screenshot captured from production.</div>
+    </div>
+    <div><img class="shot" src="assets/landing.png" alt="Coverit landing page"></div>
+  </div>
+  <div class="slide-no">04</div>
+</section>
+
+<!-- 5 — DEMO 2 / health -->
+<section class="slide">
+  <div class="kicker">Demo · the differentiator</div>
+  <div class="head-rule"></div>
+  <div class="split" style="gap:44px">
+    <div>
+      <h2 style="font-size:33px">Every scrape reports what it actually recovered.</h2>
+      <p style="margin-top:14px">Field by field, per run, in production. Note the status on these runs: <span class="tag tag-part">partial</span> — not a green checkmark. The postings listed no salary, so the run says so.</p>
+      <pre class="codeblock" style="margin-top:20px"><span class="cm">// real, unedited production record</span>
+{
+  <span class="ky">"collector_name"</span>: <span class="st">"linkedin_job"</span>,
+  <span class="ky">"status"</span>: <span class="rd">"partial"</span>,
+  <span class="ky">"fields_recovered"</span>: [<span class="st">"role_title"</span>, <span class="st">"company_name"</span>,
+      <span class="st">"seniority_level"</span>, <span class="st">"location"</span>, <span class="st">"responsibilities"</span>],
+  <span class="ky">"fields_missing"</span>: [<span class="st">"salary"</span>],
+  <span class="ky">"self_heal_events"</span>: []
+}</pre>
+      <div class="note">A scraper that quietly degrades is worse than one that crashes, because the output still looks plausible. Naming the missing fields is how you tell the difference.</div>
+    </div>
+    <div><img class="shot" src="assets/health.png" alt="Collector health view"></div>
+  </div>
+  <div class="slide-no">05</div>
+</section>
+
+<!-- 6 — THE INSIGHT -->
+<section class="slide">
+  <div class="kicker">The insight · why this is defensible</div>
+  <div class="head-rule"></div>
+  <h2>A scraper that fails loudly is a bug report.<br>A scraper that fails <em>plausibly</em> sends your application to the wrong company.</h2>
+
+  <div class="cols c2" style="margin-top:32px; gap:30px">
+    <div class="card" style="border-color:#f3d4cd; background:#fdf4f2">
+      <div class="tag tag-bad" style="margin-bottom:12px">What actually happened</div>
+      <p>The Scraper Studio collector was built against Greenhouse. Pointed at Lever and Ashby — unfamiliar layouts — it did <strong>not</strong> return empty fields.</p>
+      <p style="margin-top:11px">It returned <strong>the training company's name</strong>, every time, with the record otherwise perfectly well-formed. The app happily generated letters addressed to the wrong employer.</p>
+    </div>
+    <div class="card" style="border-color:#cfe6d8; background:#f4faf6">
+      <div class="tag tag-ok" style="margin-bottom:12px">The fix — at the application layer</div>
+      <p>Self-healing does not catch this, because from the collector's point of view nothing is broken. It found a company name.</p>
+      <pre class="codeblock" style="margin-top:13px; font-size:12px"><span class="cm"># collectors/router.py</span>
+<span class="ky">if not</span> posting.role_title:
+    <span class="ky">raise</span> BrightDataError(
+        <span class="st">"Could not read this job posting."</span>)</pre>
+      <p style="margin-top:11px">Treat a missing role title as proof the scrape did not land. Refuse rather than guess.</p>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top:26px">This is the moat in miniature. Anyone can call an LLM. The durable asset is a validated acquisition layer that knows when it is wrong — and a body of hard-won knowledge about how job boards fail.</div>
+  <div class="slide-no">06</div>
+</section>
+
+<!-- 7 — ARCHITECTURE -->
+<section class="slide">
+  <div class="kicker">How it works</div>
+  <div class="head-rule"></div>
+  <h2>Three collection paths, on purpose. One schema.</h2>
+  <p class="sub" style="margin-bottom:26px">The router picks a path per URL. Everything downstream is path-agnostic, so adding a board is additive, never a rewrite.</p>
+
+  <table>
+    <tr><th style="width:20%">URL</th><th style="width:26%">Path</th><th>Why this path</th></tr>
+    <tr>
+      <td><code>linkedin.com</code></td>
+      <td>Prebuilt LinkedIn Jobs dataset</td>
+      <td>LinkedIn is aggressively hostile to generic scraping and requires a session for most postings. The prebuilt dataset returns a fixed schema synchronously and sidesteps that entirely.</td>
+    </tr>
+    <tr>
+      <td><code>join.com</code></td>
+      <td>schema.org <code>JobPosting</code> collector</td>
+      <td>join.com renders client-side, so a generic collector reads nothing. Every posting ships a structured JSON-LD block — exact, and stable across layout changes.</td>
+    </tr>
+    <tr>
+      <td>everything else</td>
+      <td>Bright Data Scraper Studio collector</td>
+      <td>Fields are defined in plain language, not CSS selectors, so the collector can be repaired in place when a site's layout shifts.</td>
+    </tr>
+  </table>
+
+  <div class="cols c4" style="margin-top:30px">
+    <div class="card"><div class="lbl">Frontend</div><p style="margin-top:7px">Next.js 16, Tailwind v4, client-side PDF + ZIP</p></div>
+    <div class="card"><div class="lbl">Backend</div><p style="margin-top:7px">FastAPI, httpx, pydantic, concurrent scrapes</p></div>
+    <div class="card"><div class="lbl">Acquisition</div><p style="margin-top:7px">Bright Data Scraper Studio + prebuilt datasets</p></div>
+    <div class="card"><div class="lbl">Deploy</div><p style="margin-top:7px">Vercel + Railway, live in production today</p></div>
+  </div>
+  <div class="slide-no">07</div>
+</section>
+
+<!-- 8 — RELIABILITY -->
+<section class="slide">
+  <div class="kicker">Reliability</div>
+  <div class="head-rule"></div>
+  <h2>Three layers, cheapest first.</h2>
+  <p class="sub" style="margin-bottom:30px">Scraping is not a one-time build. It is a maintenance liability, and the architecture is designed around that fact.</p>
+
+  <div class="cols c3">
+    <div class="card">
+      <div class="big" style="font-size:30px; color:var(--faint)">01</div>
+      <h3 style="margin-top:8px">Plain-language fields</h3>
+      <p>Extraction is driven by what a field <em>means</em> ("the job title for this posting"), not by a selector. A renamed CSS class does not silently produce empty strings.</p>
+    </div>
+    <div class="card">
+      <div class="big" style="font-size:30px; color:var(--faint)">02</div>
+      <h3 style="margin-top:8px">Automated healing</h3>
+      <p><code>bdata scraper heal</code> repairs the collector against the live page when extraction genuinely regresses — no hand-written selectors to rewrite.</p>
+    </div>
+    <div class="card" style="border-color:#f0d9c8; background:var(--warm)">
+      <div class="big" style="font-size:30px; color:var(--coral)">03</div>
+      <h3 style="margin-top:8px">Guard against confident wrongness</h3>
+      <p>The one that matters. Validate that what came back is actually about the page you asked for — and refuse when it is not.</p>
+    </div>
+  </div>
+
+  <div class="cols c2" style="margin-top:30px; gap:26px">
+    <div>
+      <h3 style="font-size:17px; margin-bottom:9px">Three run statuses, reported honestly</h3>
+      <p style="font-size:15px"><span class="tag tag-ok">success</span> &nbsp;every expected field came back<br><br>
+      <span class="tag tag-part">partial</span> &nbsp;the scrape landed, some fields were absent from the page<br><br>
+      <span class="tag tag-bad">failed</span> &nbsp;nothing usable came back</p>
+    </div>
+    <div>
+      <h3 style="font-size:17px; margin-bottom:9px">What we refuse to do</h3>
+      <p style="font-size:15px">Unsupported boards are rejected with a clear message rather than silently mis-scraped. Company context is optional and off by default, because it is unreliable on JS-heavy marketing sites. When it returns noise, the letter is written from the posting and CV alone rather than absorbing nonsense.</p>
+    </div>
+  </div>
+  <div class="slide-no">08</div>
+</section>
+
+<!-- 9 — MARKET -->
+<section class="slide">
+  <div class="kicker">Market</div>
+  <div class="head-rule"></div>
+  <div style="display:flex; justify-content:space-between; align-items:flex-end">
+    <h2>Bottom-up, from job applications actually written.</h2>
+    <span class="assume">Modelled — assumptions stated</span>
+  </div>
+  <p class="sub" style="margin:12px 0 24px">Sized from applicant behaviour rather than from a top-down "HR tech is $30B" number, so every input below can be argued with individually.</p>
+
+  <div class="cols c3">
+    <div class="card">
+      <div class="lbl">TAM</div>
+      <div class="big" style="font-size:36px">$2.4B</div>
+      <p style="margin-top:8px"><strong>~400M</strong> white-collar job seekers globally × <strong>~$6/yr</strong> blended willingness-to-pay for application tooling.</p>
+    </div>
+    <div class="card">
+      <div class="lbl">SAM</div>
+      <div class="big" style="font-size:36px">$310M</div>
+      <p style="margin-top:8px"><strong>~26M</strong> active seekers in EU + UK + North America who apply through the supported boards, at <strong>~$12/yr</strong> realised.</p>
+    </div>
+    <div class="card warmcard">
+      <div class="lbl">SOM — 3 yr</div>
+      <div class="big" style="font-size:36px; color:var(--coral)">$4.6M</div>
+      <p style="margin-top:8px"><strong>1.5%</strong> of SAM. ~32k paying users at <strong>$144/yr</strong> (see pricing), reached via the free tier already live.</p>
+    </div>
+  </div>
+
+  <div style="margin-top:28px">
+    <h3 style="font-size:16px; margin-bottom:11px">Why the beachhead is German-language applications</h3>
+    <div class="cols c3" style="gap:20px">
+      <div><p style="font-size:14.5px"><strong>DIN 5008 is a real barrier.</strong> German applications have a formal layout standard. Generic tools output an American business letter, which reads as wrong to a German recruiter.</p></div>
+      <div><p style="font-size:14.5px"><strong>Language matching is non-trivial.</strong> A German posting needs a German <em>Anschreiben</em> with the right conventions, not a translation. Already shipped.</p></div>
+      <div><p style="font-size:14.5px"><strong>join.com is a DACH board.</strong> Supporting it is a deliberate wedge into a market the US-built incumbents ignore.</p></div>
+    </div>
+  </div>
+  <div class="foot">All figures are modelled from public population and pricing anchors, not from observed revenue. The product currently has no paid tier.</div>
+  <div class="slide-no">09</div>
+</section>
+
+<!-- 10 — UNIT ECONOMICS -->
+<section class="slide">
+  <div class="kicker">Unit economics</div>
+  <div class="head-rule"></div>
+  <div style="display:flex; justify-content:space-between; align-items:flex-end">
+    <h2>Cost per letter, from the real call graph.</h2>
+    <span class="assume">Modelled — list prices</span>
+  </div>
+  <p class="sub" style="margin:12px 0 22px">One letter = one scrape + one LLM draft. Both are metered, both are small, and the PDF is rendered client-side at zero marginal cost.</p>
+
+  <div class="cols c2" style="gap:34px; align-items:start">
+    <div>
+      <table>
+        <tr><th>Cost component</th><th class="r">Per letter</th></tr>
+        <tr><td>Bright Data scrape<div style="font-weight:400; font-size:13px; color:var(--faint)">1 collector run or dataset call</div></td><td class="r">$0.0060</td></tr>
+        <tr><td>LLM draft<div style="font-weight:400; font-size:13px; color:var(--faint)">~4k in / ~700 out, JSON mode</div></td><td class="r">$0.0100</td></tr>
+        <tr><td>CV parse + PDF render<div style="font-weight:400; font-size:13px; color:var(--faint)">server CPU + client-side jsPDF</div></td><td class="r">$0.0004</td></tr>
+        <tr class="tot"><td>Marginal COGS</td><td class="r">$0.0164</td></tr>
+      </table>
+      <div class="note">Scrape and draft costs are list-price estimates for the current call pattern, not negotiated rates or measured spend.</div>
+    </div>
+
+    <div>
+      <table>
+        <tr><th>Unit model — Pro tier</th><th class="r">Value</th></tr>
+        <tr><td>Price</td><td class="r">$12 / mo</td></tr>
+        <tr><td>Letters included</td><td class="r">40 / mo</td></tr>
+        <tr><td>Assumed real usage</td><td class="r">14 / mo</td></tr>
+        <tr><td>COGS at that usage</td><td class="r">$0.23</td></tr>
+        <tr><td>Payment + infra overhead</td><td class="r">$0.72</td></tr>
+        <tr class="tot"><td>Gross margin</td><td class="r">92%</td></tr>
+      </table>
+
+      <div class="cols c3" style="margin-top:20px; gap:13px">
+        <div class="card" style="padding:15px 15px"><div class="lbl">CAC</div><div class="big" style="font-size:26px">$18</div><p style="font-size:12.5px; margin-top:4px">content + board SEO</p></div>
+        <div class="card" style="padding:15px 15px"><div class="lbl">Lifetime</div><div class="big" style="font-size:26px">5 mo</div><p style="font-size:12.5px; margin-top:4px">job search is seasonal</p></div>
+        <div class="card warmcard" style="padding:15px 15px"><div class="lbl">LTV / CAC</div><div class="big" style="font-size:26px; color:var(--coral)">3.1×</div><p style="font-size:12.5px; margin-top:4px">$55 LTV</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">Churn is structural, not a defect: users leave because they got the job. Re-acquisition on the next search is the retention model.</div>
+  <div class="slide-no">10</div>
+</section>
+
+<!-- 11 — BUSINESS MODEL -->
+<section class="slide">
+  <div class="kicker">Business model</div>
+  <div class="head-rule"></div>
+  <div style="display:flex; justify-content:space-between; align-items:flex-end">
+    <h2>Free stays free. The batch is what converts.</h2>
+    <span class="assume">Proposed — not yet live</span>
+  </div>
+  <p class="sub" style="margin:12px 0 26px">The product is free and account-less today. That is the top of the funnel, not the business model — and it is why the free tier keeps a real, unlimited-feeling allowance.</p>
+
+  <div class="cols c3">
+    <div class="card">
+      <div class="lbl">Free</div>
+      <div class="big" style="font-size:34px">$0</div>
+      <p style="margin-top:10px"><strong>3 letters / month.</strong> No account. Full DIN 5008 PDF, no watermark, no degraded output.</p>
+      <p style="margin-top:9px; font-size:13.5px; color:var(--faint)">Purpose: prove the letter quality is different before asking for anything.</p>
+    </div>
+    <div class="card warmcard">
+      <div class="lbl accent">Pro — the core</div>
+      <div class="big" style="font-size:34px; color:var(--coral)">$12<span style="font-size:17px; color:var(--faint)">/mo</span></div>
+      <p style="margin-top:10px"><strong>40 letters, ZIP batching, saved CV profiles, letter history.</strong></p>
+      <p style="margin-top:9px; font-size:13.5px; color:var(--faint)">The trigger is volume: the day someone applies to eight roles at once, the ZIP is worth $12.</p>
+    </div>
+    <div class="card">
+      <div class="lbl">Careers services</div>
+      <div class="big" style="font-size:34px">$450<span style="font-size:17px; color:var(--faint)">/yr</span></div>
+      <p style="margin-top:10px"><strong>Per seat, university and bootcamp career offices.</strong> Cohort dashboards, institutional letterhead.</p>
+      <p style="margin-top:9px; font-size:13.5px; color:var(--faint)">Solves the churn problem: the institution renews annually even as students cycle through.</p>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top:28px"><strong>Why not charge per letter?</strong> Per-letter pricing makes users ration the product at exactly the moment it is most useful — a big application push. Subscription pricing aligns with how job searches actually happen: nothing for months, then everything in three weeks.</div>
+  <div class="slide-no">11</div>
+</section>
+
+<!-- 12 — COMPETITION -->
+<section class="slide">
+  <div class="kicker">Competition</div>
+  <div class="head-rule"></div>
+  <h2>Everyone has the LLM. Almost nobody has the acquisition layer.</h2>
+  <p class="sub" style="margin-bottom:24px">The differentiator is not letter quality in the abstract. It is that the letter is written from a verified, structured posting instead of from whatever the user managed to paste.</p>
+
+  <table>
+    <tr>
+      <th style="width:22%">Approach</th>
+      <th style="width:19%">Gets the posting how</th>
+      <th style="width:20%">Fails how</th>
+      <th>Where Coverit differs</th>
+    </tr>
+    <tr>
+      <td>ChatGPT / Claude direct</td>
+      <td>User copy-pastes</td>
+      <td>Silently incomplete input</td>
+      <td>We scrape the full posting as structured fields, so nothing depends on what the user remembered to paste.</td>
+    </tr>
+    <tr>
+      <td>Cover-letter SaaS<div style="font-weight:400; font-size:13px; color:var(--faint)">Teal, Kickresume, et al.</div></td>
+      <td>Paste, or a thin URL fetch</td>
+      <td>Generic US business-letter output</td>
+      <td>DIN 5008 layout and true language matching — a German posting yields a German Anschreiben.</td>
+    </tr>
+    <tr>
+      <td>LinkedIn Easy Apply</td>
+      <td>Native, no letter</td>
+      <td>No differentiation at all</td>
+      <td>We compete on the letter being specific, which is the only part a recruiter reads twice.</td>
+    </tr>
+    <tr>
+      <td>Build-it-yourself</td>
+      <td>Own scraper</td>
+      <td>Confidently wrong data</td>
+      <td>The failure mode on slide 06 is invisible until it has already cost someone an application. We built the guard.</td>
+    </tr>
+  </table>
+
+  <div class="cols c3" style="margin-top:26px; gap:20px">
+    <div class="card"><h3>Acquisition breadth</h3><p>Three collection paths converging on one schema. Adding a board is additive.</p></div>
+    <div class="card"><h3>Failure literacy</h3><p>Per-field run records in production. We know when we are wrong, and we say so.</p></div>
+    <div class="card"><h3>Locale correctness</h3><p>DIN 5008 and language matching are shipped, not roadmap.</p></div>
+  </div>
+  <div class="slide-no">12</div>
+</section>
+
+<!-- 13 — TRACTION / STATUS -->
+<section class="slide">
+  <div class="kicker">Status</div>
+  <div class="head-rule"></div>
+  <h2>Built and deployed, not a prototype.</h2>
+  <p class="sub" style="margin-bottom:28px">Everything below is live in production today. There is no paid tier and no user base yet — that is the honest position, and the next section is what changes it.</p>
+
+  <div class="cols c2" style="gap:34px; align-items:start">
+    <div>
+      <h3 style="font-size:16.5px; margin-bottom:14px">Shipped</h3>
+      <ul>
+        <li><b>Three collection paths</b> — LinkedIn (any URL shape), join.com, Greenhouse</li>
+        <li><b>Resume parsing</b> — PDF, TXT, Markdown, plus sender-block extraction for the letterhead</li>
+        <li><b>Language-matched generation</b> — one letter per job URL, in the posting's language</li>
+        <li><b>DIN 5008 PDF output</b> — individual files and ZIP bundling</li>
+        <li><b>Editable letters and letterhead</b> — review and correct before download</li>
+        <li><b>Collector health tracking</b> — per-field recovery, publicly visible</li>
+        <li><b>The confident-wrongness guard</b> — refuses rather than misattributes</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="font-size:16.5px; margin-bottom:14px">Known limitations — stated, not hidden</h3>
+      <ul>
+        <li><b>Three boards supported.</b> Others are refused with a clear message rather than silently mis-scraped.</li>
+        <li><b>Extraction completeness varies</b> by layout. Incomplete runs report <span class="tag tag-part">partial</span> with fields named.</li>
+        <li><b>Contact extraction is regex-based.</b> Unusual CV layouts may miss a field; missing fields collapse rather than print blank.</li>
+        <li><b>Run history is in-memory</b> and resets on backend restart.</li>
+        <li><b>No paid tier, no auth, no user accounts</b> yet.</li>
+      </ul>
+      <div class="note">The health view exposes these anyway. Stating them here is cheaper than being found out.</div>
+    </div>
+  </div>
+  <div class="slide-no">13</div>
+</section>
+
+<!-- 14 — ROADMAP / ASK -->
+<section class="slide">
+  <div class="kicker">The ask</div>
+  <div class="head-rule"></div>
+  <div style="display:flex; justify-content:space-between; align-items:flex-end">
+    <h2>$400k pre-seed — 18 months to a proven paid funnel.</h2>
+    <span class="assume">Proposed</span>
+  </div>
+  <p class="sub" style="margin:12px 0 26px">The engineering risk is retired: it works, it is deployed, and the hard failure mode is understood and guarded. What is unproven is willingness to pay. That is what this round buys an answer to.</p>
+
+  <div class="cols c4" style="margin-bottom:28px">
+    <div class="card"><div class="lbl">Engineering</div><div class="big" style="font-size:30px">45%</div><p style="margin-top:7px">Board coverage 3 → 15, persistent storage, accounts and billing.</p></div>
+    <div class="card"><div class="lbl">Acquisition</div><div class="big" style="font-size:30px">30%</div><p style="margin-top:7px">Content and board SEO against the CAC assumption on slide 10.</p></div>
+    <div class="card"><div class="lbl">Infra + data</div><div class="big" style="font-size:30px">15%</div><p style="margin-top:7px">Bright Data and LLM spend at 10× current volume.</p></div>
+    <div class="card"><div class="lbl">Reserve</div><div class="big" style="font-size:30px">10%</div><p style="margin-top:7px">Runway buffer past the 18-month mark.</p></div>
+  </div>
+
+  <table>
+    <tr><th style="width:16%">Milestone</th><th style="width:26%">Target</th><th>What it proves</th></tr>
+    <tr><td>Month 3</td><td>Accounts, billing, 15 job boards</td><td>The acquisition layer generalises beyond the three boards it was built against.</td></tr>
+    <tr><td>Month 6</td><td>1,000 paying users</td><td>The $12 price point clears against a genuinely useful free tier.</td></tr>
+    <tr><td>Month 12</td><td>First 10 careers-services contracts</td><td>The institutional channel solves structural churn.</td></tr>
+    <tr><td>Month 18</td><td>$45k MRR, LTV/CAC ≥ 3</td><td>The unit model on slide 10 survives contact with real users.</td></tr>
+  </table>
+  <div class="slide-no">14</div>
+</section>
+
+<!-- 15 — CLOSE -->
+<section class="slide cover" style="background:linear-gradient(150deg,#fff2ea 0%,#fdf6f0 45%,#fff8f0 100%)">
+  <div class="head-rule"></div>
+  <h1 style="max-width:900px">The writing was never the hard part.<br>Knowing the posting is <em>real</em> is.</h1>
+  <p class="sub" style="margin-top:24px; font-size:19px; max-width:760px">Coverit is a validated job-posting acquisition layer with a cover-letter product on top. The letter is what users buy. The acquisition layer is what competitors cannot copy from a screenshot.</p>
+
+  <div class="cols c3" style="margin-top:44px; max-width:1000px">
+    <div class="card"><div class="lbl">Live product</div><p style="margin-top:7px; color:var(--ink); font-weight:600">coveritt.vercel.app</p></div>
+    <div class="card"><div class="lbl">Collector health</div><p style="margin-top:7px; color:var(--ink); font-weight:600">/health</p></div>
+    <div class="card"><div class="lbl">Source</div><p style="margin-top:7px; color:var(--ink); font-weight:600">github.com/karankartikeya/cvsmart</p></div>
+  </div>
+
+  <div class="meta" style="margin-top:44px">Built for Into the Scrape-Verse · WeMakeDevs × Bright Data</div>
+  <div class="slide-no">15</div>
+</section>
+
+</body>
+</html>

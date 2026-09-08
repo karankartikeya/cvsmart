@@ -27,21 +27,21 @@ const SITE_DESCRIPTION =
 
 export const metadata: Metadata = {
   title: {
-    default: "CV Cover — cover letters from the real job posting",
-    template: "%s · CV Cover",
+    default: "Coverit — cover letters from the real job posting",
+    template: "%s · Coverit",
   },
   description: SITE_DESCRIPTION,
-  applicationName: "CV Cover",
+  applicationName: "Coverit",
   keywords: ["cover letter", "job application", "CV", "resume", "LinkedIn", "Greenhouse", "join.com"],
   openGraph: {
     type: "website",
-    siteName: "CV Cover",
-    title: "CV Cover — cover letters from the real job posting",
+    siteName: "Coverit",
+    title: "Coverit — cover letters from the real job posting",
     description: SITE_DESCRIPTION,
   },
   twitter: {
     card: "summary_large_image",
-    title: "CV Cover — cover letters from the real job posting",
+    title: "Coverit — cover letters from the real job posting",
     description: SITE_DESCRIPTION,
   },
 };
