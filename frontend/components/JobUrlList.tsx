@@ -6,14 +6,18 @@ export default function JobUrlList({
   jobUrls,
   onAdd,
   onRemove,
+  maxUrls,
 }: {
   jobUrls: string[];
   onAdd: (url: string) => void;
   onRemove: (index: number) => void;
+  maxUrls?: number;
 }) {
   const [draft, setDraft] = useState("");
+  const atLimit = maxUrls !== undefined && jobUrls.length >= maxUrls;
 
   function handleAdd() {
+    if (atLimit) return;
     const trimmed = draft.trim();
     if (!trimmed) return;
     onAdd(trimmed);
@@ -35,11 +39,26 @@ export default function JobUrlList({
           }}
           placeholder="https://www.linkedin.com/jobs/view/3986111804"
           className="input"
+          disabled={atLimit}
         />
-        <button type="button" onClick={handleAdd} className="btn-primary shrink-0">
+        <button
+          type="button"
+          onClick={handleAdd}
+          className="btn-primary shrink-0"
+          disabled={atLimit}
+        >
           + ADD
         </button>
       </div>
+      {atLimit && (
+        <p className="mt-1.5 text-xs text-magenta">
+          Free tier limit reached ({maxUrls} job{maxUrls === 1 ? "" : "s"} per generation).{" "}
+          <a href="/signup" className="font-semibold underline">
+            Sign up
+          </a>{" "}
+          for more.
+        </p>
+      )}
       <p className="mt-1.5 text-xs text-stone">
         Works with LinkedIn, Greenhouse and join.com links. On LinkedIn you can
         paste the URL straight from the address bar, search results included.
