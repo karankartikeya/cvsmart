@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Caveat, Inter, Source_Serif_4 } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import AuthProvider from "@/components/AuthProvider";
+import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 import "./globals.css";
 
 const inter = Inter({
@@ -59,7 +62,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${inter.variable} ${sourceSerif.variable} ${caveat.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {children}
+        <AuthProvider>
+          <Nav />
+          <div className="flex-1">{children}</div>
+          <Footer />
+        </AuthProvider>
         {/* Both are inert outside Vercel, so local development is unaffected. */}
         <Analytics />
         <SpeedInsights />
