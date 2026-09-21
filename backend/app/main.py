@@ -1,10 +1,21 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
+from app.db import close_pool, init_pool
 from app.routes import generate, health
 
-app = FastAPI(title="Coverit")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await init_pool()
+    yield
+    await close_pool()
+
+
+app = FastAPI(title="Coverit", lifespan=lifespan)
 
 # Local development is always allowed; deployed frontends are added through
 # ALLOWED_ORIGINS so the hosted site is not locked out by a hardcoded list.
@@ -22,6 +33,7 @@ app.add_middleware(
     allow_origin_regex=r"https://.*\.vercel\.app",
     allow_methods=["*"],
     allow_headers=["*"],
+    allow_credentials=True,
 )
 
 app.include_router(generate.router, prefix="/api")

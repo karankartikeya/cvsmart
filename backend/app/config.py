@@ -10,6 +10,23 @@ class Settings(BaseSettings):
     # Comma separated list of extra origins allowed to call the API.
     allowed_origins: str = ""
 
+    # Supabase project + Postgres connection (Phase 1). Blank until the
+    # project exists; auth/DB routes stay disabled until these are set.
+    supabase_url: str = ""
+    supabase_jwt_aud: str = "authenticated"
+    supabase_service_role_key: str = ""
+    database_url: str = ""
+
+    # Anonymous usage-limit signing (Phase 3).
+    cookie_signing_secret: str = ""
+    ip_hash_salt: str = ""
+
+    # Stripe billing (Phase 4).
+    stripe_secret_key: str = ""
+    stripe_webhook_secret: str = ""
+    stripe_price_id_basic: str = ""
+    stripe_price_id_premium: str = ""
+
     class Config:
         env_file = ".env"
 
