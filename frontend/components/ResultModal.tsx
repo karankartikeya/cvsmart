@@ -60,7 +60,7 @@ export default function ResultModal({
         role="dialog"
         aria-modal="true"
         aria-label={loading ? "Generating cover letters" : "Your cover letters"}
-        className="flex max-h-[88vh] w-full max-w-2xl flex-col overflow-hidden rounded-[20px] bg-white shadow-[0_24px_60px_rgba(43,26,23,0.28)]"
+        className="flex max-h-[88vh] w-full max-w-2xl flex-col overflow-hidden rounded-[20px] bg-shell shadow-[0_24px_60px_rgba(0,0,0,0.5)]"
       >
         {loading ? (
           <LoadingState />
@@ -115,7 +115,7 @@ function LoadingState() {
             key={item.label}
             className="h-1.5 w-8 rounded-full transition-colors duration-500"
             style={{
-              background: i <= step ? "var(--gradient-sunset)" : "rgba(43,26,23,0.1)",
+              background: i <= step ? "var(--gradient-sunset)" : "rgba(255,255,255,0.1)",
             }}
           />
         ))}

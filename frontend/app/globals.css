@@ -1,32 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  /* Sunset palette: coral through amber to pink, warm and high energy. */
-  --color-coral: #ff5a5f;
-  --color-flame: #ff7847;
-  --color-amber: #ffa62b;
-  --color-gold: #ffc93c;
-  --color-blush: #ff5c8a;
-  --color-magenta: #e8467c;
-  --color-plum: #2d1b2e;
+  /* Neon palette: electric blue through violet to cyan, dark-mode techy. */
+  --color-coral: #5b8cff;
+  --color-flame: #7c5cff;
+  --color-amber: #a855f7;
+  --color-gold: #22d3ee;
+  --color-blush: #7c5cff;
+  --color-magenta: #7c5cff;
+  --color-plum: #0a0a0f;
 
-  /* Warm neutrals, tinted toward the accent rather than pure grey. */
-  --color-cream: #fff8f3;
-  --color-shell: #fff1e8;
-  --color-pure-white: #ffffff;
-  --color-ink: #2b1a17;
-  --color-graphite: #6b524b;
-  --color-stone: #9b837b;
-  --color-hairline: rgba(43, 26, 23, 0.09);
+  /* Cool dark neutrals. */
+  --color-cream: #0a0a0f;
+  --color-shell: #131318;
+  --color-pure-white: #16161d;
+  --color-ink: #f2f3f7;
+  --color-graphite: #b4b6c2;
+  --color-stone: #767a8a;
+  --color-hairline: rgba(255, 255, 255, 0.09);
 
   --gradient-sunset: linear-gradient(
     120deg,
     var(--color-coral) 0%,
-    var(--color-flame) 35%,
-    var(--color-amber) 70%,
+    var(--color-flame) 45%,
+    var(--color-amber) 75%,
     var(--color-gold) 100%
   );
-  --gradient-blush: linear-gradient(120deg, var(--color-magenta) 0%, var(--color-flame) 100%);
+  --gradient-blush: linear-gradient(120deg, var(--color-flame) 0%, var(--color-gold) 100%);
 
   --background: var(--color-cream);
   --foreground: var(--color-ink);
@@ -59,7 +59,7 @@ body {
   font-family: var(--font-notioninter), ui-sans-serif, system-ui, sans-serif;
 }
 
-/* Soft sunset wash behind the page so the cream canvas is not flat. */
+/* Soft neon wash behind the page so the dark canvas is not flat. */
 body::before {
   content: "";
   position: fixed;
@@ -67,9 +67,9 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(60% 45% at 15% 0%, rgba(255, 92, 138, 0.16), transparent 70%),
-    radial-gradient(55% 40% at 88% 8%, rgba(255, 166, 43, 0.18), transparent 70%),
-    radial-gradient(50% 45% at 50% 100%, rgba(255, 120, 71, 0.1), transparent 70%);
+    radial-gradient(60% 45% at 15% 0%, rgba(124, 92, 255, 0.16), transparent 70%),
+    radial-gradient(55% 40% at 88% 8%, rgba(34, 211, 238, 0.12), transparent 70%),
+    radial-gradient(50% 45% at 50% 100%, rgba(91, 140, 255, 0.1), transparent 70%);
 }
 
 .font-editorial {
@@ -97,10 +97,10 @@ body::before {
   flex-shrink: 0;
   border-radius: 9999px;
   background: var(--gradient-sunset);
-  color: var(--color-pure-white);
+  color: var(--color-ink);
   font-weight: 700;
   font-size: 18px;
-  box-shadow: 0 4px 12px rgba(255, 90, 95, 0.32);
+  box-shadow: 0 0 16px rgba(124, 92, 255, 0.45);
 }
 
 .dropzone {
@@ -113,7 +113,7 @@ body::before {
   width: 100%;
   padding: 28px 20px;
   border-radius: 16px;
-  border: 2px dashed rgba(255, 120, 71, 0.4);
+  border: 2px dashed rgba(124, 92, 255, 0.35);
   background: var(--color-shell);
   color: var(--color-stone);
   cursor: pointer;
@@ -123,7 +123,7 @@ body::before {
 .dropzone:hover,
 .dropzone.dropzone-active {
   border-color: var(--color-flame);
-  background: #ffe6d6;
+  background: #1a1a24;
   transform: translateY(-2px);
 }
 
@@ -131,7 +131,7 @@ body::before {
   width: 100%;
   border-radius: 10px;
   border: 1.5px solid var(--color-hairline);
-  background: var(--color-pure-white);
+  background: var(--color-shell);
   padding: 11px 14px;
   font-size: 14px;
   color: var(--color-ink);
@@ -139,31 +139,31 @@ body::before {
 }
 
 .input::placeholder {
-  color: rgba(43, 26, 23, 0.32);
+  color: rgba(242, 243, 247, 0.32);
 }
 
 .input:focus {
   outline: none;
   border-color: var(--color-flame);
-  box-shadow: 0 0 0 3px rgba(255, 120, 71, 0.16);
+  box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.2);
 }
 
 .btn-primary {
   position: relative;
   background: var(--gradient-sunset);
   background-size: 160% 100%;
-  color: var(--color-pure-white);
+  color: #ffffff;
   font-size: 14px;
   font-weight: 600;
   border-radius: 10px;
   padding: 12px 24px;
-  box-shadow: 0 4px 14px rgba(255, 90, 95, 0.3);
+  box-shadow: 0 0 20px rgba(124, 92, 255, 0.35);
   transition: background-position 300ms ease, box-shadow 200ms ease, transform 150ms ease;
 }
 
 .btn-primary:hover:not(:disabled) {
   background-position: 100% 0;
-  box-shadow: 0 6px 20px rgba(255, 90, 95, 0.42);
+  box-shadow: 0 0 28px rgba(124, 92, 255, 0.5);
   transform: translateY(-1px);
 }
 
@@ -178,17 +178,19 @@ body::before {
 
 .btn-ghost {
   background: var(--color-shell);
-  color: var(--color-magenta);
+  color: var(--color-gold);
   font-size: 14px;
   font-weight: 600;
   border-radius: 10px;
   padding: 7px 16px;
-  transition: background-color 200ms ease, color 200ms ease;
+  border: 1px solid var(--color-hairline);
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
 }
 
 .btn-ghost:hover {
-  background: #ffe0ea;
+  background: #1a1a24;
   color: var(--color-coral);
+  border-color: rgba(124, 92, 255, 0.4);
 }
 
 .btn-text {
@@ -202,21 +204,22 @@ body::before {
 }
 
 .btn-text:hover {
-  color: var(--color-coral);
+  color: var(--color-gold);
 }
 
 .card {
-  background: var(--color-pure-white);
+  background: var(--color-shell);
   border-radius: 18px;
   border: 1px solid var(--color-hairline);
   padding: 24px;
-  box-shadow: 0 2px 10px rgba(43, 26, 23, 0.04);
-  transition: box-shadow 250ms ease, transform 250ms ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  transition: box-shadow 250ms ease, transform 250ms ease, border-color 250ms ease;
 }
 
-/* Step cards lift and warm on hover so the form feels responsive. */
+/* Step cards lift and glow on hover so the form feels responsive. */
 .card-interactive:hover {
-  box-shadow: 0 10px 28px rgba(255, 120, 71, 0.14);
+  box-shadow: 0 10px 32px rgba(124, 92, 255, 0.18);
+  border-color: rgba(124, 92, 255, 0.3);
   transform: translateY(-2px);
 }
 
