@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
@@ -35,6 +35,15 @@ app.add_middleware(
     allow_headers=["*"],
     allow_credentials=True,
 )
+
+
+
+@app.middleware("http")
+async def ensure_db_pool(request: Request, call_next):
+    # Serverless hosts may skip ASGI lifespan events; init_pool is idempotent.
+    await init_pool()
+    return await call_next(request)
+
 
 app.include_router(generate.router, prefix="/api")
 app.include_router(health.router, prefix="/api")

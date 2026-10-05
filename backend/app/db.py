@@ -7,9 +7,10 @@ _pool: asyncpg.Pool | None = None
 
 async def init_pool() -> None:
     global _pool
-    if not settings.database_url:
+    if _pool is not None or not settings.database_url:
         return
-    _pool = await asyncpg.create_pool(settings.database_url, min_size=1, max_size=10)
+    # Small pool: serverless instances each hold their own connections.
+    _pool = await asyncpg.create_pool(settings.database_url, min_size=1, max_size=3)
 
 
 async def close_pool() -> None:

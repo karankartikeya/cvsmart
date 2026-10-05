@@ -1,11 +1,30 @@
 # Deploying Coverit
 
-Two services: the FastAPI backend on Railway, the Next.js frontend on Vercel.
+Two services: the FastAPI backend and the Next.js frontend. Both can live on
+Vercel (as two projects from this repo); see "Backend on Vercel" below. Railway
+still works as an alternative.
 Deploy the backend first, since the frontend needs its URL.
 
 Both read secrets from environment variables. Never commit `.env`.
 
-## 1. Backend on Railway
+## 1a. Backend on Vercel (no Railway needed)
+
+1. **Add New** → **Project** → import `cvsmart`, name it e.g. `coverit-api`.
+2. Set **Root Directory** to `backend`. `vercel.json` and `api/index.py`
+   already route every request to the FastAPI app.
+3. Add the same environment variables as the Railway table below (plus
+   `ALLOWED_ORIGINS=https://coveritt.vercel.app`, and the Supabase/Stripe
+   vars if you use accounts or billing).
+4. Enable **Fluid Compute** in Settings → Functions. `maxDuration` is set to
+   300s because Bright Data scrapes can run up to 2 minutes; lower it if
+   your plan caps it.
+5. Deploy, then check `https://YOUR-API.vercel.app/api/ping`.
+6. Set `NEXT_PUBLIC_API_BASE` on the frontend project to that URL and
+   redeploy the frontend.
+
+Use a pooled Postgres connection string (Supabase pooler) for `DATABASE_URL`.
+
+## 1b. Backend on Railway
 
 1. Go to [railway.app](https://railway.app) and sign in with GitHub.
 2. **New Project** → **Deploy from GitHub repo** → pick `cvsmart`.
